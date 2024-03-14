@@ -75,6 +75,12 @@ bool parseAppendStatement(){
     // Append then id then expression and end
     //Check if second keyword is what its supposed to be
     //Remove front() first by erasing
+
+    //DEBUG
+    cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        cout << keyword << " ";
+    }
     cout <<"parseAppendStatement" << endl;
     cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
     keyWords.erase(keyWords.begin());
@@ -96,16 +102,25 @@ bool parseAppendStatement(){
         if(keyWords.front() == ";"){
             // Reached the end of the statement
             return true;
+        } else {
+            return false;
         }
+    } else {
+        return false;
     }
+}
+
+// Function to parse list statement
+bool parseListStatement(){
+    return true;
 }
 
 int main() {
     cout << "Enter a string: ";
-    cin >> input;
+    getline(cin, input);
     cout << "Input: " << input << endl;
 
-    if (parseProgram() && position == input.length()) {  // Check if the whole input is parsed
+    if (parseProgram()) {  // Check if the whole input is parsed
         cout << "Success: The string belongs to the language." << endl;
     } else {
         cout << "Error: The string does not belong to the language." << endl;

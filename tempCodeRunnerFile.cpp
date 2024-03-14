@@ -1,1 +1,1 @@
-cout << "Input: " << input << endl;
+<
