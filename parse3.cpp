@@ -46,9 +46,7 @@ bool parseProgram(){
         //Put the Statement keywords into vector
         getWordsVector();
         // Check if the statement is valid
-        parseStatement();
-        // Return true
-        return true;
+        return parseStatement();
     }
     // else return false
     return false;
@@ -63,10 +61,42 @@ bool parseStatement() {
     if(firstKeyword == "append"){
         // Parse append statement to check the validity
         return parseAppendStatement();
-    }
-    if(firstKeyword == "list"){
+    } else if(firstKeyword == "list"){
         // Parse list statement to check validity
         return parseListStatement();
+    } else {
+        // Unexpected token, first keyword not valid
+        return false;
+    }
+}
+
+// Function to parse the append Statement
+bool parseAppendStatement(){
+    // Append then id then expression and end
+    //Check if second keyword is what its supposed to be
+    //Remove front() first by erasing
+    cout <<"parseAppendStatement" << endl;
+    cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+
+    //Check if its id
+    if (token == "id"){
+        //Should be followed by expression which can be recursive
+        //Remove the id and check the next expression
+        keyWords.erase(keyWords.begin());
+
+        // For now, lets pretend the expression will always be any word 
+        // Pop again to check the last keyword
+        keyWords.erase(keyWords.begin());
+        
+        // Now check if the current keyword is valid
+        if(keyWords.front() == ";"){
+            // Reached the end of the statement
+            return true;
+        }
     }
 }
 
