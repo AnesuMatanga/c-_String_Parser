@@ -21,6 +21,13 @@ bool parseValue();
 // Function prototypes for the Lexer tokens first keywords
 bool parseAppendStatement();
 bool parseListStatement();
+bool parseExitStatement();
+bool parsePrintStatement();
+bool parsePrintLengthStatement();
+bool parsePrintWordsStatement();
+bool parsePrintWordCountStatement();
+bool parseSetStatement();
+bool parseReverseStatement();
 
 // Function prototype to get a vector of words from string
 void getWordsVector();
@@ -64,6 +71,27 @@ bool parseStatement() {
     } else if(firstKeyword == "list"){
         // Parse list statement to check validity
         return parseListStatement();
+    } else if(firstKeyword == "exit"){
+        // Parse exit statement to check validity
+        return parseExitStatement();
+    } else if(firstKeyword == "print"){
+        // Parse print statement to check validity
+        return parsePrintStatement();
+    } else if(firstKeyword == "printlength"){
+        // Parse printlength list statement to check validity
+        return parsePrintLengthStatement();
+    } else if(firstKeyword == "printwords"){
+        // Parse printwords statement to check validity
+        return parsePrintWordsStatement();
+    } else if(firstKeyword == "printwordcount"){
+        // Parse printwordcount statement to check validity
+        return parsePrintWordCountStatement();
+    } else if(firstKeyword == "set"){
+        // Parse set statement to check validity
+        return parseSetStatement();
+    } else if(firstKeyword == "reverse"){
+        // Parse reverse statement to check validity
+        return parseReverseStatement();
     } else {
         // Unexpected token, first keyword not valid
         // Error Handling
@@ -120,6 +148,42 @@ bool parseAppendStatement(){
 bool parseListStatement(){
     return true;
 }
+
+// Function to parse list statement
+bool parseExitStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parsePrintStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parsePrintLengthStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parsePrintWordsStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parsePrintWordCountStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parseSetStatement(){
+    return true;
+}
+
+// Function to parse list statement
+bool parseReverseStatement(){
+    return true;
+}
+
 
 int main() {
     cout << "Enter a string: ";
