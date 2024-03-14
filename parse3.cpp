@@ -41,10 +41,10 @@ void getWordsVector(){
 
 // Function to parse Program non-terminal
 bool parseProgram(){
-    // Check if the input string has words
-    while(input.length() > 0){
-        //Put the Statement keywords into vector
-        getWordsVector();
+    //Put the Statement keywords into vector
+    getWordsVector();
+    // Check if the keyWords still has words
+    while(!keyWords.empty()){
         // Check if the statement is valid
         return parseStatement();
     }
@@ -66,6 +66,8 @@ bool parseStatement() {
         return parseListStatement();
     } else {
         // Unexpected token, first keyword not valid
+        // Error Handling
+        cout <<"Error: Keyword " << firstKeyword <<" unrecognized" << endl;
         return false;
     }
 }
@@ -103,9 +105,13 @@ bool parseAppendStatement(){
             // Reached the end of the statement
             return true;
         } else {
+            // Error Handling
+            cout <<"Error: Expected end of statement identifier" << endl;
             return false;
         }
     } else {
+        // Error Handling
+        cout <<"Error: Expected 'id' identifier" << endl;
         return false;
     }
 }
