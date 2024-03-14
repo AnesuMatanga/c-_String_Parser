@@ -7,6 +7,8 @@ using namespace std;
 
 // Global Variables
 string input;
+// Vector with keywords
+vector<string> keyWords;
 // Current position
 size_t position = 0;  
 
@@ -21,29 +23,28 @@ bool parseAppendStatement();
 bool parseListStatement();
 
 // Function prototype to get a vector of words from string
-vector<string> getWordsVector();
+void getWordsVector();
 
 
 // Function to divide the input into keywords and put in vector
-vector<string> getWordsVector(){
+void getWordsVector(){
     // Initialise stringstream with the object.
     stringstream ss(input);
     string word;
-    // Initialise a vector
-    vector<string> keyWord;
+
     // While loop to extract the words 
     while (ss >> word){
         // Add to the vector
-        keyWord.push_back(word);
+        keyWords.push_back(word);
     }
-
-    return keyWord;
 }
 
 // Function to parse Program non-terminal
 bool parseProgram(){
     // Check if the input string has words
     while(input.length() > 0){
+        //Put the Statement keywords into vector
+        getWordsVector();
         // Check if the statement is valid
         parseStatement();
         // Return true
@@ -57,9 +58,15 @@ bool parseProgram(){
 bool parseStatement() {
     // Check the first keyword of a statement is valid before diving in
     // Check if first keyword is append
-    if(input[0] == "append"){
+    string firstKeyword = keyWords.front();
+    cout <<"keyWords Front = " << firstKeyword << endl;
+    if(firstKeyword == "append"){
         // Parse append statement to check the validity
         return parseAppendStatement();
+    }
+    if(firstKeyword == "list"){
+        // Parse list statement to check validity
+        return parseListStatement();
     }
 }
 
