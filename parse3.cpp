@@ -9,6 +9,11 @@ using namespace std;
 string input;
 // Vector with keywords
 vector<string> keyWords;
+// Vector to keep record of ids variable name
+vector<string> ids;
+// Vector to keep track of constants variable names
+vector<string> constants;
+// Vector to keep track of the literal
 // Current position
 size_t position = 0;  
 
@@ -38,11 +43,42 @@ void getWordsVector(){
     // Initialise stringstream with the object.
     stringstream ss(input);
     string word;
+    string stringLiteral = "";
+    int countHiphens = 0;
+    bool isStringLiteral = false;
+    
+    cout << endl;
+    cout <<"getWordsVector()" << endl;
 
     // While loop to extract the words 
     while (ss >> word){
-        // Add to the vector
-        keyWords.push_back(word);
+        cout <<"word[0]: " << word[0] << endl;
+        cout <<"word: " << word << endl;
+        cout <<"Word.length: " << word.length() << endl; 
+        // Check if in the nput there is a string literal identified by ""
+        if (((word[0] == '"') || (word[word.length() - 1] == '"')) || ((countHiphens > 0) && (countHiphens < 2))){
+            // Count the hiphens until you know its the end (2 hiphens)
+            if ((word[0] == '"') || (word[word.length() - 1] == '"')){
+                countHiphens++;
+            }
+            cout <<"Is StringLiteral word: " << word << endl;
+            stringLiteral = stringLiteral + word + " ";
+            cout <<"StringLiteral: " << stringLiteral << endl;
+        } else if(countHiphens == 0){
+            // Add to the vector
+            cout <<"Is a Keyword: " << word << endl;
+            keyWords.push_back(word);
+        } else {
+            cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
+            isStringLiteral = true;
+            // Push back the whole string
+            cout <<"stringLiteral = " << stringLiteral << endl;
+            keyWords.push_back(stringLiteral);
+            // Reset so it can continue adding words
+            countHiphens = 0;
+        }
+
+        
     }
 }
 
@@ -63,6 +99,13 @@ bool parseProgram(){
 bool parseStatement() {
     // Check the first keyword of a statement is valid before diving in
     // Check if first keyword is append
+    //DEBUG
+    cout << endl;
+    cout <<"parseStatement()" << endl;
+    cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        cout << keyword << " ";
+    }
     string firstKeyword = keyWords.front();
     cout <<"keyWords Front = " << firstKeyword << endl;
     if(firstKeyword == "append"){
@@ -125,8 +168,12 @@ bool parseAppendStatement(){
         keyWords.erase(keyWords.begin());
 
         // For now, lets pretend the expression will always be any word 
-        // Pop again to check the last keyword
-        keyWords.erase(keyWords.begin());
+        
+
+        // Pop again to check the last end of statement keyword
+        if (!keyWords.empty()){
+            keyWords.erase(keyWords.begin());
+        }
         
         // Now check if the current keyword is valid
         if(keyWords.front() == ";"){
