@@ -61,21 +61,23 @@ void getWordsVector(){
             if ((word[0] == '"') || (word[word.length() - 1] == '"')){
                 countHiphens++;
             }
+
+            if(countHiphens == 2){          
+                cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
+                isStringLiteral = true;
+                // Push back the whole string
+                cout <<"stringLiteral = " << stringLiteral << endl;
+                keyWords.push_back(stringLiteral);
+                // Reset so it can continue adding words
+                countHiphens = 0;
+            }
             cout <<"Is StringLiteral word: " << word << endl;
             stringLiteral = stringLiteral + word + " ";
             cout <<"StringLiteral: " << stringLiteral << endl;
-        } else if(countHiphens == 0){
+        } else {
             // Add to the vector
             cout <<"Is a Keyword: " << word << endl;
             keyWords.push_back(word);
-        } else {
-            cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
-            isStringLiteral = true;
-            // Push back the whole string
-            cout <<"stringLiteral = " << stringLiteral << endl;
-            keyWords.push_back(stringLiteral);
-            // Reset so it can continue adding words
-            countHiphens = 0;
         }
 
         
