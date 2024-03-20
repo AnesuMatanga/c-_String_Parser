@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cctype>
 
 using namespace std;
 
@@ -35,52 +36,112 @@ bool parseSetStatement();
 bool parseReverseStatement();
 
 // Function prototype to get a vector of words from string
-void getWordsVector();
+bool getWordsVector();
+
+// Other Helper Functions Prototypes
+void emptyVector();
+bool isSpecialCharacter(char c);
+bool isWordValid(string word);
+
+// Function to define special characters of the language
+bool isSpecialCharacter(char c){
+    // Special characters
+    string specialCharacters = "~`!@#$%^&*()_+=-{}[]|/;:',.<>?\\";
+
+    // Check if char c is a special char using find
+    bool isSpecial = specialCharacters.find(c);
+
+    return isSpecial;
+}
+
+// Function to check the validity of a word in the string literal
+bool isWordValid(string word){
+    bool isValid = true;
+    
+    // Get the length of the word
+    int wordLength = word.length();
+
+    // Iterate through each char in word
+    for (int i = 0; i < wordLength; i++){
+        // Use isalpha from cctype to check word char is alpha
+        if(!isalpha(word[i])){
+            std::cout <<"Word: " << word[i] << " is not Alpha." << endl;
+            // Check if char is special
+            if(isSpecialCharacter(word[i]) && word[i] != '"'){
+                cout <<"Word[i] Special = " << word[i] << endl;
+                // Check if the special char escape clause is first '\'
+                if(word[i] != '\\'){
+                    // Now check if the char before it is escape clause
+                    if(word[i - 1] != '\\'){
+                        // Word is not valid
+                        isValid = false;
+                        std::cout <<"Error: missing escape clause for special char in string literal" << endl;
+                        return isValid;
+                    }
+                } else if(word[i] == '\\'){
+                    // Now check that there is another special char infront
+                    if(isSpecialCharacter(word[i + 1])){
+                        isValid = true;
+                    } else {
+                        //Escape clause is not followed by sepcial char
+                        isValid = false;
+                        std::cout <<"Error: Escape clause in string literal not followed by any special char" << endl;
+                        return isValid;
+                    }
+                }
+            }
+        }
+    }
+    cout <<"Word is Valid?: " << isValid << endl;
+    return isValid;
+}
 
 
 // Function to divide the input into keywords and put in vector
-void getWordsVector(){
+bool getWordsVector(){
     // Initialise stringstream with the object.
     stringstream ss(input);
     string word;
     string stringLiteral = "";
     int countHiphens = 0;
     bool isStringLiteral = false;
+    bool isValidWord = false;
     
-    cout << endl;
-    cout <<"getWordsVector()" << endl;
-    cout <<"Input Length: " << input.length() << endl;
+    std::cout << endl;
+    std::cout <<"getWordsVector()" << endl;
+    std::cout <<"Input Length: " << input.length() << endl;
 
     // While loop to extract the words 
     while (ss >> word){
-        cout <<"word[0]: " << word[0] << endl;
-        cout <<"word: " << word << endl;
-        cout <<"Word.length: " << word.length() << endl; 
+        std::cout <<"word[0]: " << word[0] << endl;
+        std::cout <<"word: " << word << endl;
+        std::cout <<"Word.length: " << word.length() << endl; 
         // Check if in the nput there is a string literal identified by ""
         if (((word[0] == '"') || (word[word.length() - 1] == '"')) || ((countHiphens > 0) && (countHiphens < 2))){
             // Count the hiphens until you know its the end (2 hiphens)
             if (word[0] == '"') {
+                isValidWord = isWordValid(word);
                 countHiphens++; 
-                cout <<"Count Hiphens WORD[0]: " << countHiphens << endl;
+                std::cout <<"Count Hiphens WORD[0]: " << countHiphens << endl;
             } else if (word[word.length() - 1] == '"'){
                 // Check first if it has escape clause '\'
-                cout <<"Word is '\\'" << word[word.length() - 2] << endl;
+                std::cout <<"Word is '\\'" << word[word.length() - 2] << endl;
                 if(word[word.length() - 2] != '\\'){
                     countHiphens++;
-                    cout <<"Count Hiphens WORD - 2: " << countHiphens << endl;
-                    cout <<"WORD - 2: " << word[word.length() - 2] << endl;
+                    std::cout <<"Count Hiphens WORD - 2: " << countHiphens << endl;
+                    std::cout <<"WORD - 2: " << word[word.length() - 2] << endl;
                 }
             }
 
-            cout <<"Is StringLiteral word: " << word << endl;
+            std::cout <<"Is StringLiteral word: " << word << endl;
             stringLiteral = stringLiteral + word + " ";
-            cout <<"StringLiteral: " << stringLiteral << endl;
+            std::cout <<"StringLiteral: " << stringLiteral << endl;
 
             if(countHiphens == 2){          
-                cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
+                std::cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
                 isStringLiteral = true;
                 // Push back the whole string
-                cout <<"stringLiteral = " << stringLiteral << endl;
+                std::cout <<"stringLiteral = " << stringLiteral << endl;
                 keyWords.push_back(stringLiteral);
                 // Reset so it can continue adding words
                 countHiphens = 0;
@@ -88,18 +149,24 @@ void getWordsVector(){
             
         } else {
             // Add to the vector
-            cout <<"Is a Keyword: " << word << endl;
+            std::cout <<"Is a Keyword: " << word << endl;
             keyWords.push_back(word);
         }
 
         
     }
+
+    return isValidWord;
 }
 
 // Function to parse Program non-terminal
 bool parseProgram(){
     //Put the Statement keywords into vector
-    getWordsVector();
+    bool isValid = getWordsVector();
+
+    if(!isValid){
+        return false;
+    }
     // Check if the keyWords still has words
     while(!keyWords.empty()){
         // Check if the statement is valid
@@ -114,14 +181,14 @@ bool parseStatement() {
     // Check the first keyword of a statement is valid before diving in
     // Check if first keyword is append
     //DEBUG
-    cout << endl;
-    cout <<"parseStatement()" << endl;
-    cout <<"Keywords: " << endl;
+    std::cout << endl;
+    std::cout <<"parseStatement()" << endl;
+    std::cout <<"Keywords: " << endl;
     for (const auto& keyword: keyWords){
-        cout << keyword << " ";
+        std::cout << keyword << " ";
     }
     string firstKeyword = keyWords.front();
-    cout <<"keyWords Front = " << firstKeyword << endl;
+    std::cout <<"keyWords Front = " << firstKeyword << endl;
     if(firstKeyword == "append"){
         // Parse append statement to check the validity
         return parseAppendStatement();
@@ -152,7 +219,7 @@ bool parseStatement() {
     } else {
         // Unexpected token, first keyword not valid
         // Error Handling
-        cout <<"Error: Keyword " << firstKeyword <<" unrecognized" << endl;
+        std::cout <<"Error: Keyword " << firstKeyword <<" unrecognized" << endl;
         return false;
     }
 }
@@ -164,14 +231,14 @@ bool parseAppendStatement(){
     //Remove front() first by erasing
 
     //DEBUG
-    cout <<"Keywords: " << endl;
+    std::cout <<"Keywords: " << endl;
     for (const auto& keyword: keyWords){
-        cout << keyword << " ";
+        std::cout << keyword << " ";
     }
-    cout <<"parseAppendStatement" << endl;
-    cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    std::cout <<"parseAppendStatement" << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
     keyWords.erase(keyWords.begin());
-    cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
 
     string token = keyWords.front();
 
@@ -195,13 +262,20 @@ bool parseAppendStatement(){
             return true;
         } else {
             // Error Handling
-            cout <<"Error: Expected end of statement identifier" << endl;
+            std::cout <<"Error: Expected end of statement identifier" << endl;
             return false;
         }
     } else {
         // Error Handling
-        cout <<"Error: Expected 'id' identifier" << endl;
+        std::cout <<"Error: Expected 'id' identifier" << endl;
         return false;
+    }
+}
+
+// Function to empty the vector
+void emptyVector(){
+    while(!keyWords.empty()){
+        keyWords.pop_back();
     }
 }
 
@@ -249,15 +323,18 @@ bool parseReverseStatement(){
 int main() {
     input = "";
     while (input != "exit;"){
-        cout << "Enter a string: ";
+        std::cout << "Enter a string: ";
         getline(cin, input);
-        cout << "While Input: " << input << endl;
+        std::cout << "While Input: " << input << endl;
 
         if (parseProgram()) {  // Check if the whole input is parsed
-            cout << "Success: The string belongs to the language." << endl;
+            std::cout << "Success: The string belongs to the language." << endl;
         } else {
-            cout << "Error: The string does not belong to the language." << endl;
+            std::cout << "Error: The string does not belong to the language." << endl;
         }
+
+        // Empty Vector
+        emptyVector();
     }
 
     return 0;
