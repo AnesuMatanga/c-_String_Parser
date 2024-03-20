@@ -49,6 +49,7 @@ void getWordsVector(){
     
     cout << endl;
     cout <<"getWordsVector()" << endl;
+    cout <<"Input Length: " << input.length() << endl;
 
     // While loop to extract the words 
     while (ss >> word){
@@ -58,9 +59,22 @@ void getWordsVector(){
         // Check if in the nput there is a string literal identified by ""
         if (((word[0] == '"') || (word[word.length() - 1] == '"')) || ((countHiphens > 0) && (countHiphens < 2))){
             // Count the hiphens until you know its the end (2 hiphens)
-            if ((word[0] == '"') || (word[word.length() - 1] == '"')){
-                countHiphens++;
+            if (word[0] == '"') {
+                countHiphens++; 
+                cout <<"Count Hiphens WORD[0]: " << countHiphens << endl;
+            } else if (word[word.length() - 1] == '"'){
+                // Check first if it has escape clause '\'
+                cout <<"Word is '\\'" << word[word.length() - 2] << endl;
+                if(word[word.length() - 2] != '\\'){
+                    countHiphens++;
+                    cout <<"Count Hiphens WORD - 2: " << countHiphens << endl;
+                    cout <<"WORD - 2: " << word[word.length() - 2] << endl;
+                }
             }
+
+            cout <<"Is StringLiteral word: " << word << endl;
+            stringLiteral = stringLiteral + word + " ";
+            cout <<"StringLiteral: " << stringLiteral << endl;
 
             if(countHiphens == 2){          
                 cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
@@ -71,9 +85,7 @@ void getWordsVector(){
                 // Reset so it can continue adding words
                 countHiphens = 0;
             }
-            cout <<"Is StringLiteral word: " << word << endl;
-            stringLiteral = stringLiteral + word + " ";
-            cout <<"StringLiteral: " << stringLiteral << endl;
+            
         } else {
             // Add to the vector
             cout <<"Is a Keyword: " << word << endl;
@@ -235,14 +247,17 @@ bool parseReverseStatement(){
 
 
 int main() {
-    cout << "Enter a string: ";
-    getline(cin, input);
-    cout << "Input: " << input << endl;
+    input = "";
+    while (input != "exit;"){
+        cout << "Enter a string: ";
+        getline(cin, input);
+        cout << "While Input: " << input << endl;
 
-    if (parseProgram()) {  // Check if the whole input is parsed
-        cout << "Success: The string belongs to the language." << endl;
-    } else {
-        cout << "Error: The string does not belong to the language." << endl;
+        if (parseProgram()) {  // Check if the whole input is parsed
+            cout << "Success: The string belongs to the language." << endl;
+        } else {
+            cout << "Error: The string does not belong to the language." << endl;
+        }
     }
 
     return 0;
