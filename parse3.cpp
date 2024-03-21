@@ -42,6 +42,7 @@ bool getWordsVector();
 void emptyVector();
 bool isSpecialCharacter(char c);
 bool isWordValid(string word);
+bool isIdentifierValid(string identifier);
 
 // Function to define special characters of the language
 bool isSpecialCharacter(char c){
@@ -52,6 +53,30 @@ bool isSpecialCharacter(char c){
     bool isSpecial = specialCharacters.find(c);
 
     return isSpecial;
+}
+
+// Function to validate the expression
+bool isIdentifierValid(string identifier){
+    bool isValid = true;
+
+    // Get the length of the expression
+    int idLength = identifier.length();
+
+    // Loop through and validate each char
+    for(int i = 0; i < idLength; i++){
+        // Check if char isAlpha
+        if(!isalpha(identifier[i])){
+            // Check if char is digit, if not error
+            if(!isdigit(identifier[i])){
+                isValid = false;
+                cout <<"Error: Invalid Identifier" << endl;
+                return false;
+            }
+        }
+    }
+
+    return isValid;
+
 }
 
 // Function to check the validity of a word in the string literal
@@ -246,7 +271,7 @@ bool parseAppendStatement(){
     string token = keyWords.front();
 
     //Check if its id is valid
-    if (!keyWords.empty() && isWordValid(keyWords.front())){
+    if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
         std::cout <<"ID: " << keyWords.front() << endl;
         //Should be followed by expression which can be recursive
         //Remove the id and check the next expression
