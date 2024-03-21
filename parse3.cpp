@@ -145,16 +145,26 @@ bool getWordsVector(){
 
         // If expression a string literal
         if(isStringLiteral) {
-            // Add the word to the string literal
-            stringLiteral += word + " ";
-            // Check if the word ends with unescaped quote
-            // String is same as vector so can access it that way
-            if(word.back() == '"' && (word.length() == 1 || word[word.length() - 2] != '\\')) {
+            // Check if the last word is right next to ; without space
+            if(word.back() == ';' && word.length() > 1 && word[word.length() - 2] == '"'){
+                // Split the last word into two strings, for ; to be added to vector
+                stringLiteral += word.substr(0, word.length() - 1);
+                // Add the substrings to keyWord vector
+                keyWords.push_back(stringLiteral);
+                keyWords.push_back(";");
+                 // Reached the end of literal, so put isStringLiteral to false
+                isStringLiteral = false;
+                // Check if the word ends with unescaped quote
+                // String is same as vector so can access it that way
+            } else if(word.back() == '"' && (word.length() == 1 || word[word.length() - 2] != '\\')) {
                 // Add to the string Literal, add to keyWords Vector
                 keyWords.push_back(stringLiteral);
                 // Reached the end of literal, so put isStringLiteral to false
                 isStringLiteral = false; 
-            }
+            } else {
+                // Add the word to the string literal
+                stringLiteral += word + " ";
+            } 
         } else {
             // Check if the word starts with quote "
             if(word.front() == '"'){
