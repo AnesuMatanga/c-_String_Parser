@@ -75,7 +75,7 @@ bool isWordValid(string word){
                     if(word[i - 1] != '\\'){
                         // Word is not valid
                         isValid = false;
-                        std::cout <<"Error: missing escape clause for special char in string literal" << endl;
+                        std::cout <<"Error: missing escape clause for special char" << word[i] << " in string literal" << endl;
                         return isValid;
                     }
                 } else if(word[i] == '\\'){
@@ -105,7 +105,7 @@ bool getWordsVector(){
     string stringLiteral = "";
     int countHiphens = 0;
     bool isStringLiteral = false;
-    bool isValidWord = false;
+    bool isValidWord = true;
     
     std::cout << endl;
     std::cout <<"getWordsVector()" << endl;
@@ -117,45 +117,44 @@ bool getWordsVector(){
         std::cout <<"word: " << word << endl;
         std::cout <<"Word.length: " << word.length() << endl; 
         // Check if in the nput there is a string literal identified by ""
-        if (((word[0] == '"') || (word[word.length() - 1] == '"')) || ((countHiphens > 0) && (countHiphens < 2))){
-            // Count the hiphens until you know its the end (2 hiphens)
-            if (word[0] == '"') {
-                isValidWord = isWordValid(word);
-                countHiphens++; 
-                std::cout <<"Count Hiphens WORD[0]: " << countHiphens << endl;
-            } else if (word[word.length() - 1] == '"'){
-                // Check first if it has escape clause '\'
-                std::cout <<"Word is '\\'" << word[word.length() - 2] << endl;
-                if(word[word.length() - 2] != '\\'){
-                    countHiphens++;
-                    std::cout <<"Count Hiphens WORD - 2: " << countHiphens << endl;
-                    std::cout <<"WORD - 2: " << word[word.length() - 2] << endl;
-                }
-            }
 
-            std::cout <<"Is StringLiteral word: " << word << endl;
-            stringLiteral = stringLiteral + word + " ";
-            std::cout <<"StringLiteral: " << stringLiteral << endl;
-
-            if(countHiphens == 2){          
-                std::cout <<"2 Hiphens Counted. Adding sentence: " << stringLiteral << endl; 
-                isStringLiteral = true;
-                // Push back the whole string
-                std::cout <<"stringLiteral = " << stringLiteral << endl;
+        // If expression a string literal
+        if(isStringLiteral) {
+            // Add the word to the string literal
+            stringLiteral += word + " ";
+            // Check if the word ends with unescaped quote
+            // String is same as vector so can access it that way
+            if(word.back() == '"' && (word.length() == 1 || word[word.length() - 2] != '\\')) {
+                // Add to the string Literal, add to keyWords Vector
                 keyWords.push_back(stringLiteral);
-                // Reset so it can continue adding words
-                countHiphens = 0;
+                // Reached the end of literal, so put isStringLiteral to false
+                isStringLiteral = false; 
             }
-            
         } else {
-            // Add to the vector
-            std::cout <<"Is a Keyword: " << word << endl;
-            keyWords.push_back(word);
+            // Check if the word starts with quote "
+            if(word.front() == '"'){
+                // Start of stringLiteral so put to true
+                isStringLiteral = true;
+                stringLiteral = word + " ";
+                // Special case, check for string literal with only one word
+                if(word.back() == '"' && word.length() > 1) {
+                    keyWords.push_back(stringLiteral);
+                    // Stop looping 
+                    isStringLiteral = false;
+                }
+            } else {
+                // Add regular words(commands like append) to the vector
+                keyWords.push_back(word);
+            }
         }
-
-        
     }
 
+    // If isStringLiteral true after whileLoop, means string not closed in quotes
+    if(isStringLiteral){
+        // Error, string literal incorrectly inputted
+        cout <<"Error: String literal not enclosed within quotes." << endl;
+        isValidWord = false;
+    }
     return isValidWord;
 }
 
