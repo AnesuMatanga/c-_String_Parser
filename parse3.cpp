@@ -63,12 +63,12 @@ bool isWordValid(string word){
 
     // Iterate through each char in word
     for (int i = 0; i < wordLength; i++){
-        // Use isalpha from cctype to check word char is alpha
-        if(!isalpha(word[i])){
+        // Use isalpha from cctype to check word char is alpha/digit 
+        if(!isalpha(word[i]) && !isdigit(word[i])){
             std::cout <<"Word: " << word[i] << " is not Alpha." << endl;
             // Check if char is special
             if(isSpecialCharacter(word[i]) && word[i] != '"'){
-                cout <<"Word[i] Special = " << word[i] << endl;
+                std::cout <<"Word[i] Special = " << word[i] << endl;
                 // Check if the special char escape clause is first '\'
                 if(word[i] != '\\'){
                     // Now check if the char before it is escape clause
@@ -241,8 +241,8 @@ bool parseAppendStatement(){
 
     string token = keyWords.front();
 
-    //Check if its id
-    if (token == "id"){
+    //Check if its id is valid
+    if (!keyWords.empty() && isWordValid(keyWords.front())){
         //Should be followed by expression which can be recursive
         //Remove the id and check the next expression
         keyWords.erase(keyWords.begin());
