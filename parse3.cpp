@@ -64,8 +64,8 @@ bool isWordValid(string word){
     // Iterate through each char in word
     for (int i = 0; i < wordLength; i++){
         // Use isalpha from cctype to check word char is alpha/digit 
-        if(!isalpha(word[i]) && !isdigit(word[i])){
-            std::cout <<"Word: " << word[i] << " is not Alpha." << endl;
+        if(!isalpha(word[i]) && !isdigit(word[i]) && word[i] != '"' && word[i] != ' '){
+            std::cout <<"Word i "<< i << ": " << word[i] << " is not Alpha." << endl;
             // Check if char is special
             if(isSpecialCharacter(word[i]) && word[i] != '"'){
                 std::cout <<"Word[i] Special = " << word[i] << endl;
@@ -92,7 +92,7 @@ bool isWordValid(string word){
             }
         }
     }
-    cout <<"Word is Valid?: " << isValid << endl;
+    std::cout <<"Word is Valid?: " << isValid << endl;
     return isValid;
 }
 
@@ -152,7 +152,7 @@ bool getWordsVector(){
     // If isStringLiteral true after whileLoop, means string not closed in quotes
     if(isStringLiteral){
         // Error, string literal incorrectly inputted
-        cout <<"Error: String literal not enclosed within quotes." << endl;
+        std::cout <<"Error: String literal not enclosed within quotes." << endl;
         isValidWord = false;
     }
     return isValidWord;
@@ -229,12 +229,16 @@ bool parseAppendStatement(){
     //Check if second keyword is what its supposed to be
     //Remove front() first by erasing
 
+    std::cout << endl;
+    std::cout <<"parseAppendStatement()" << endl;
+    std::cout << endl;
+
     //DEBUG
     std::cout <<"Keywords: " << endl;
     for (const auto& keyword: keyWords){
         std::cout << keyword << " ";
     }
-    std::cout <<"parseAppendStatement" << endl;
+    std::cout << endl;
     std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
     keyWords.erase(keyWords.begin());
     std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
@@ -243,32 +247,37 @@ bool parseAppendStatement(){
 
     //Check if its id is valid
     if (!keyWords.empty() && isWordValid(keyWords.front())){
+        std::cout <<"ID: " << keyWords.front() << endl;
         //Should be followed by expression which can be recursive
         //Remove the id and check the next expression
         keyWords.erase(keyWords.begin());
 
-        // For now, lets pretend the expression will always be any word 
-        
-
-        // Pop again to check the last end of statement keyword
-        if (!keyWords.empty()){
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty() && isWordValid(keyWords.front())){
+            // Remove the expression from the vector
             keyWords.erase(keyWords.begin());
-        }
-        
-        // Now check if the current keyword is valid
-        if(keyWords.front() == ";"){
-            // Reached the end of the statement
-            return true;
-        } else {
-            // Error Handling
-            std::cout <<"Error: Expected end of statement identifier" << endl;
-            return false;
+            // Now check if the current keyword is valid
+            if(keyWords.front() == ";"){
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
         }
     } else {
         // Error Handling
         std::cout <<"Error: Expected 'id' identifier" << endl;
         return false;
     }
+        
+        // Pop again to check the last end of statement keyword
+        //if (!keyWords.empty()){
+            //keyWords.erase(keyWords.begin());
+        //} 
+        return false;    
 }
 
 // Function to empty the vector
