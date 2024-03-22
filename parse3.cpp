@@ -3,15 +3,22 @@
 #include <vector>
 #include <sstream>
 #include <cctype>
+#include <regex>
 
 using namespace std;
+
+// Declaring an id struct to store the value of ids
+struct Ids {
+    string idName;
+    string value;
+};
 
 // Global Variables
 string input;
 // Vector with keywords
 vector<string> keyWords;
 // Vector to keep record of ids variable name
-vector<string> ids;
+vector<Ids> ids;
 // Vector to keep track of constants variable names
 vector<string> constants;
 // Vector to keep track of the literal
@@ -43,6 +50,31 @@ void emptyVector();
 bool isSpecialCharacter(char c);
 bool isWordValid(string word);
 bool isIdentifierValid(string identifier);
+bool checkIdentifierExists(string id);
+
+// Function to check if id has been set
+bool checkIdentifierExists(string id){
+    bool doesExist = false;
+
+    cout << endl;
+    cout <<"checkIdentifierExists" << endl;
+    cout << endl;
+
+    // Use for loop to traverse the vector
+    for(const auto& idName: ids){
+        // Check if its in the vector
+        if(idName.idName == id){
+            doesExist = true;
+        }
+    }
+
+    // Error message if idName not matched
+    if(!doesExist){
+        cout <<"Error: Stated identifier invalid or not set." << endl;
+    }
+
+    return doesExist;
+}
 
 // Function to define special characters of the language
 bool isSpecialCharacter(char c){
@@ -55,26 +87,25 @@ bool isSpecialCharacter(char c){
     return isSpecial;
 }
 
-// Function to validate the expression
+// Function to validate the identifier using the regex library
 bool isIdentifierValid(string identifier){
     bool isValid = true;
 
-    // Get the length of the expression
-    int idLength = identifier.length();
+    cout << endl;
+    cout << "isIdentifierValid" << endl;
+    cout << endl;
+    // Declare the regex object id_regex
+    const regex id_regex("[a-zA-Z][a-zA-Z0-9]*");
 
-    // Loop through and validate each char
-    for(int i = 0; i < idLength; i++){
-        // Check if char isAlpha
-        if(!isalpha(identifier[i])){
-            // Check if char is digit, if not error
-            if(!isdigit(identifier[i])){
-                isValid = false;
-                cout <<"Error: Invalid Identifier" << endl;
-                return false;
-            }
-        }
+    // Check if there is a match with the pattern using regex_match
+    if(!regex_match(identifier, id_regex)){
+        // Error
+        isValid = false;
+        cout <<"Error: Invalid, Identifier doesnt match correct pattern" << endl;
+    } else {
+        cout <<"Identifier pattern CORRECT" << endl;
     }
-
+    
     return isValid;
 
 }
@@ -82,40 +113,21 @@ bool isIdentifierValid(string identifier){
 // Function to check the validity of a word in the string literal
 bool isWordValid(string word){
     bool isValid = true;
-    
-    // Get the length of the word
-    int wordLength = word.length();
 
-    // Iterate through each char in word
-    for (int i = 0; i < wordLength; i++){
-        // Use isalpha from cctype to check word char is alpha/digit 
-        if(!isalpha(word[i]) && !isdigit(word[i]) && word[i] != '"' && word[i] != ' '){
-            std::cout <<"Word i "<< i << ": " << word[i] << " is not Alpha." << endl;
-            // Check if char is special
-            if(isSpecialCharacter(word[i]) && word[i] != '"'){
-                std::cout <<"Word[i] Special = " << word[i] << endl;
-                // Check if the special char escape clause is first '\'
-                if(word[i] != '\\'){
-                    // Now check if the char before it is escape clause
-                    if(word[i - 1] != '\\'){
-                        // Word is not valid
-                        isValid = false;
-                        std::cout <<"Error: missing escape clause for special char" << word[i] << " in string literal" << endl;
-                        return isValid;
-                    }
-                } else if(word[i] == '\\'){
-                    // Now check that there is another special char infront
-                    if(isSpecialCharacter(word[i + 1])){
-                        isValid = true;
-                    } else {
-                        //Escape clause is not followed by sepcial char
-                        isValid = false;
-                        std::cout <<"Error: Escape clause in string literal not followed by any special char" << endl;
-                        return isValid;
-                    }
-                }
-            }
-        }
+    cout << endl;
+    cout <<"isWordValid()" << endl;
+    cout << endl;
+
+    // Declare & instantiate string literal expression regex object
+    const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:']*")");
+   
+    // Check if the expression valid, matches the pattern
+    if(!regex_match(word, expression_regex)){
+        isValid = false;
+        // Error, invalid stringLiteral
+        cout <<"Error: String Literal invalid" << endl;
+    } else {
+        cout <<"String Literal expression CORRECT" << endl;
     }
     std::cout <<"Word is Valid?: " << isValid << endl;
     return isValid;
@@ -279,12 +291,22 @@ bool parseAppendStatement(){
     std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
 
     string token = keyWords.front();
-
-    //Check if its id is valid
+    // Declare a struct to store the ids
+    string id = "";
+    // Check if its id is valid
     if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
         std::cout <<"ID: " << keyWords.front() << endl;
-        //Should be followed by expression which can be recursive
-        //Remove the id and check the next expression
+        // Should be followed by expression which can be recursive
+
+        // Save the id
+        id = keyWords.front();
+        // Now check if Id is valid whose value going to be appended to
+        bool idExists = checkIdentifierExists(id);
+        if(!idExists){
+            return false;
+        }
+
+        // Remove the id and check the next expression
         keyWords.erase(keyWords.begin());
 
         std::cout <<"Expression: " << keyWords.front() << endl;
@@ -354,6 +376,64 @@ bool parsePrintWordCountStatement(){
 
 // Function to parse list statement
 bool parseSetStatement(){
+
+     // Append then id then expression and end
+    //Check if second keyword is what its supposed to be
+    //Remove front() first by erasing
+
+    std::cout << endl;
+    std::cout <<"parseSetStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    // Declare a struct to store the ids
+    struct Ids id;
+    //Check if its id is valid
+    if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
+        std::cout <<"ID: " << keyWords.front() << endl;
+        //Should be followed by expression which can be recursive
+        // Save Id in the vector<Ids> ids that stores ids
+        id.idName = keyWords.front();
+        
+        //Remove the id and check the next expression
+        keyWords.erase(keyWords.begin());
+
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty() && isWordValid(keyWords.front())){
+            // Save the value of the id to later add to the vector ids
+            id.value = keyWords.front();
+            // Now save to the vector
+            ids.push_back(id);
+
+            // Remove the expression from the vector
+            keyWords.erase(keyWords.begin());
+            // Now check if the current keyword is valid
+            if(keyWords.front() == ";"){
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error: Expected 'id' identifier" << endl;
+        return false;
+    }
+           
     return true;
 }
 
