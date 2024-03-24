@@ -60,6 +60,10 @@ bool checkIdentifierExists(string id){
     cout <<"checkIdentifierExists" << endl;
     cout << endl;
 
+    for(const auto& idNm: ids){
+        cout <<"idName: " << idNm.idName << endl;
+    }
+
     // Use for loop to traverse the vector
     for(const auto& idName: ids){
         // Check if its in the vector
@@ -119,13 +123,13 @@ bool isWordValid(string word){
     cout << endl;
 
     // Declare & instantiate string literal expression regex object
-    const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:']*")");
+    const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*")");
    
     // Check if the expression valid, matches the pattern
     if(!regex_match(word, expression_regex)){
         isValid = false;
         // Error, invalid stringLiteral
-        cout <<"Error: String Literal invalid" << endl;
+        cout <<"Error: String Literal invalid, doesnt match pattern" << endl;
     } else {
         cout <<"String Literal expression CORRECT" << endl;
     }
@@ -182,12 +186,19 @@ bool getWordsVector(){
             if(word.front() == '"'){
                 // Start of stringLiteral so put to true
                 isStringLiteral = true;
-                stringLiteral = word + " ";
+                //stringLiteral = word + " ";
+                cout <<"Word.length() - 2 = " << word[word.length() - 2] << endl;
                 // Special case, check for string literal with only one word
-                if(word.back() == '"' && word.length() > 1) {
+                if((word.back() == '"' || (word.back() == ';' && word[word.length() - 2] == '"')) && word.length() > 1) {
+                     // Split the last word into two strings, for ; to be added to vector
+                    stringLiteral += word.substr(0, word.length() - 1);
+                    // Add the substrings to keyWord vector
                     keyWords.push_back(stringLiteral);
+                    keyWords.push_back(";");
                     // Stop looping 
                     isStringLiteral = false;
+                } else {
+                    stringLiteral = word + " ";
                 }
             } else {
                 // Add regular words(commands like append) to the vector
