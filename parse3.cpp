@@ -123,8 +123,12 @@ bool isWordValid(string word){
     cout << endl;
 
     // Declare & instantiate string literal expression regex object
-    const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*")");
-   
+    //const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*")");
+    // To recall where i learnt this: https://cplusplus.com/reference/regex/ECMAScript/
+    // ^ for negating the target chars like " and backslash
+    // OR except any char after backslash which is what . stands for
+    const regex expression_regex(R"("([^"\\]|\\.)*")");
+
     // Check if the expression valid, matches the pattern
     if(!regex_match(word, expression_regex)){
         isValid = false;
