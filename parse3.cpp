@@ -162,6 +162,7 @@ bool getWordsVector(){
     int countHiphens = 0;
     bool isStringLiteral = false;
     bool isValidWord = true;
+    bool isStringValid = false;
     
     std::cout << endl;
     std::cout <<"getWordsVector()" << endl;
@@ -179,7 +180,12 @@ bool getWordsVector(){
             // Check if the last word is right next to ; without space
             if(word.back() == ';' && word.length() > 1 && word[word.length() - 2] == '"'){
                 // Split the last word into two strings, for ; to be added to vector
-                stringLiteral += word.substr(0, word.length() - 1);
+                stringLiteral += word.substr(0, word.length() - 2);
+                // Check if String Literal is valid fiorst before adding to vector
+                isStringValid = isWordValid(stringLiteral);
+                // Now take the substr without the string open and close quotes
+                stringLiteral = stringLiteral.substr(1, stringLiteral.length() - 1);
+                cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
                 // Add the substrings to keyWord vector
                 keyWords.push_back(stringLiteral);
                 keyWords.push_back(";");
@@ -207,6 +213,11 @@ bool getWordsVector(){
                 if((word.back() == '"' || (word.back() == ';' && word[word.length() - 2] == '"')) && word.length() > 1) {
                      // Split the last word into two strings, for ; to be added to vector
                     stringLiteral += word.substr(0, word.length() - 1);
+                    // Check if String Literal is valid fiorst before adding to vector
+                    isStringValid = isWordValid(stringLiteral);
+                    // Now take the substr without the string open and close quotes
+                    stringLiteral = stringLiteral.substr(1, stringLiteral.length() - 2);
+                    cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
                     // Add the substrings to keyWord vector
                     keyWords.push_back(stringLiteral);
                     keyWords.push_back(";");
@@ -338,7 +349,7 @@ bool parseAppendStatement(){
 
         std::cout <<"Expression: " << keyWords.front() << endl;
         // For now, check the expression is valid 
-        if (!keyWords.empty() && isWordValid(keyWords.front())){
+        if (!keyWords.empty()){
             express = keyWords.front();
             // Remove the expression from the vector
             keyWords.erase(keyWords.begin());
@@ -495,7 +506,7 @@ bool parseSetStatement(){
 
         std::cout <<"Expression: " << keyWords.front() << endl;
         // For now, check the expression is valid 
-        if (!keyWords.empty() && isWordValid(keyWords.front())){
+        if (!keyWords.empty()){
             // Save the value of the id to later add to the vector ids
             id.value = keyWords.front();
             // Now save to the vector
