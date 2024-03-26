@@ -53,6 +53,11 @@ bool isIdentifierValid(string identifier);
 bool checkIdentifierExists(string id);
 void declareConstants();
 
+// Global variables to help figure out if expression is either id|constant|literal
+bool exprIsID = false;
+bool exprIsLiteral = false;
+bool exprIsConstant = false;
+
 // Function to Declaring language constants and storing them in constants vector
 void declareConstants() {
     // Add the 3 language constants to the vector
@@ -163,6 +168,7 @@ bool getWordsVector(){
     bool isStringLiteral = false;
     bool isValidWord = true;
     bool isStringValid = false;
+    exprIsLiteral = false;
     
     std::cout << endl;
     std::cout <<"getWordsVector()" << endl;
@@ -205,6 +211,9 @@ bool getWordsVector(){
         } else {
             // Check if the word starts with quote "
             if(word.front() == '"'){
+                // Update exprIsLiteral global var to indicate expression is literal
+                exprIsLiteral = true;
+
                 // Start of stringLiteral so put to true
                 isStringLiteral = true;
                 //stringLiteral = word + " ";
@@ -239,6 +248,8 @@ bool getWordsVector(){
         std::cout <<"Error: String literal not enclosed within quotes." << endl;
         isValidWord = false;
     }
+
+    cout <<"isExprLiteral?: " << exprIsLiteral << endl;
     return isValidWord;
 }
 
@@ -348,6 +359,7 @@ bool parseAppendStatement(){
         keyWords.erase(keyWords.begin());
 
         std::cout <<"Expression: " << keyWords.front() << endl;
+        cout <<"isExprLiteral?: " << exprIsLiteral << endl;
         // For now, check the expression is valid 
         if (!keyWords.empty()){
             express = keyWords.front();
@@ -355,15 +367,34 @@ bool parseAppendStatement(){
             keyWords.erase(keyWords.begin());
             // Now check if the current keyword is valid
             if(keyWords.front() == ";"){
-                // Now append since statement is valid
-                // use & to alter the actual object
-                for (auto &idName: ids){
-                    if (idName.idName == id){
-                        // Concatenta new expression to existing idValue
-                        idName.value += express;
+                // If exprIsLiteral is false, it means expression is either ID/Constant
+                // Now append since statement is valid 
+                if (!exprIsLiteral && checkIdentifierExists(express)){
+                    cout << "NOT String Literal, so ID" << endl;
+                    for(auto &idName: ids){
+                        if(idName.idName == express){
+                            cout <<"idName.value express = "<< idName.value << endl;
+                            for(auto &idObj: ids){
+                                if(idObj.idName == id){
+                                    cout <<"idObj.value id = "<< idObj.value << endl;
+                                    // Append contents
+                                    idObj.value += idName.value;
+                                }
+                            }
+                            // Reached the end of the statement
+                            return true;
+                        }
+                    }
+                } else {
+                    // use & to alter the actual object
+                    for (auto &idName: ids){
+                        if (idName.idName == id){
+                            // Concatenta new expression to existing idValue
+                            idName.value += express;
 
-                         // Reached the end of the statement
-                        return true;
+                            // Reached the end of the statement
+                            return true;
+                        }
                     }
                 }
             } else {
