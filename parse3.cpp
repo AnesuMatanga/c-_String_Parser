@@ -19,11 +19,11 @@ string input;
 vector<string> keyWords;
 // Vector to keep record of ids variable name
 vector<Ids> ids;
-// Vector to keep track of constants variable names
+// Vector to store language constants
 vector<string> constants;
 // Vector to keep track of the literal
 // Current position
-size_t position = 0;  
+size_t position = 0; 
 
 // Function prototypes for the EBNF Tokens in bold
 bool parseProgram();
@@ -51,6 +51,15 @@ bool isSpecialCharacter(char c);
 bool isWordValid(string word);
 bool isIdentifierValid(string identifier);
 bool checkIdentifierExists(string id);
+void declareConstants();
+
+// Function to Declaring language constants and storing them in constants vector
+void declareConstants() {
+    // Add the 3 language constants to the vector
+    constants.push_back("SPACE");
+    constants.push_back("TAB");
+    constants.push_back("NEWLINEW");
+}
 
 // Function to check if id has been set
 bool checkIdentifierExists(string id){
@@ -124,6 +133,8 @@ bool isWordValid(string word){
 
     // Declare & instantiate string literal expression regex object
     //const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*")");
+    // Try this pattern "([a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|\/><,.;:?']*(\\\")?)*"
+    
     // To recall where i learnt this: https://cplusplus.com/reference/regex/ECMAScript/
     // ^ for negating the target chars like " and backslash
     // OR except any char after backslash which is what . stands for
@@ -308,6 +319,7 @@ bool parseAppendStatement(){
     string token = keyWords.front();
     // Declare a struct to store the ids
     string id = "";
+    string express = "";
     // Check if its id is valid
     if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
         std::cout <<"ID: " << keyWords.front() << endl;
@@ -327,12 +339,22 @@ bool parseAppendStatement(){
         std::cout <<"Expression: " << keyWords.front() << endl;
         // For now, check the expression is valid 
         if (!keyWords.empty() && isWordValid(keyWords.front())){
+            express = keyWords.front();
             // Remove the expression from the vector
             keyWords.erase(keyWords.begin());
             // Now check if the current keyword is valid
             if(keyWords.front() == ";"){
-                // Reached the end of the statement
-                return true;
+                // Now append since statement is valid
+                // use & to alter the actual object
+                for (auto &idName: ids){
+                    if (idName.idName == id){
+                        // Concatenta new expression to existing idValue
+                        idName.value += express;
+
+                         // Reached the end of the statement
+                        return true;
+                    }
+                }
             } else {
                 // Error Handling
                 std::cout <<"Error: Expected end of statement identifier" << endl;
@@ -371,7 +393,55 @@ bool parseExitStatement(){
 
 // Function to parse list statement
 bool parsePrintStatement(){
-    return true;
+
+    //Check if second keyword is what its supposed to be
+    //Remove front() first by erasing
+
+    std::cout << endl;
+    std::cout <<"parsePrintStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    string express = keyWords.front();
+    std::cout <<"Expression: " << keyWords.front() << endl;
+    // For now, check the expression is valid 
+    if (!keyWords.empty() && checkIdentifierExists(keyWords.front())){
+        // Remove the expression from the vector
+        keyWords.erase(keyWords.begin());
+        // Now check if the current keyword is valid
+        if(keyWords.front() == ";"){
+
+            // Print the expression since statement is valid
+            // Check if expression is id
+            for(auto &idName: ids){
+                if(idName.idName == express){
+                    // Print it out
+                    cout <<"ID Name: " << idName.idName << endl;
+                    cout <<"ID Value: " << idName.value << endl;
+
+                    // Reached the end of the statement
+                    return true;
+                }
+            }
+
+        } else {
+            // Error Handling
+            std::cout <<"Error: Expected end of statement identifier" << endl;
+            return false;
+        }
+    }    
+   
+    return false;   
 }
 
 // Function to parse list statement
@@ -430,6 +500,7 @@ bool parseSetStatement(){
             id.value = keyWords.front();
             // Now save to the vector
             ids.push_back(id);
+            cout <<"id.value = " << ids.back().value << endl;
 
             // Remove the expression from the vector
             keyWords.erase(keyWords.begin());
@@ -454,11 +525,63 @@ bool parseSetStatement(){
 
 // Function to parse list statement
 bool parseReverseStatement(){
-    return true;
+    
+    std::cout << endl;
+    std::cout <<"parseReverseStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    // Declare a struct to store the ids
+    string id = "";
+    // Check if its id is valid
+    if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
+        std::cout <<"ID: " << keyWords.front() << endl;
+        // Should be followed by expression which can be recursive
+
+        // Save the id
+        id = keyWords.front();
+        // Now check if Id is valid whose value going to be appended to
+        bool idExists = checkIdentifierExists(id);
+        if(!idExists){
+            return false;
+        }
+
+        // Remove the id and check the next expression
+        keyWords.erase(keyWords.begin());
+
+    
+        if(keyWords.front() == ";"){
+            // Reached the end of the statement
+            return true;
+        } else {
+            // Error Handling
+            std::cout <<"Error: Expected end of statement identifier" << endl;
+            return false;
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error: Expected 'id' identifier" << endl;
+        return false;
+    }
+        
+    return false;   
 }
 
 
 int main() {
+    // Declare language constants (SPACE|NEWLINE|TAB)
+    declareConstants();
+
     input = "";
     while (input != "exit;"){
         std::cout << "Enter a string: ";
