@@ -21,15 +21,21 @@ vector<string> keyWords;
 vector<Ids> ids;
 // Vector to store language constants
 vector<string> constants;
-// Vector to keep track of the literal
+// Vector to store expression word by word
+vector<string> expression;
+
 // Current position
 size_t position = 0; 
+// nextToken variable to work with parseExpression
+string nextToken;
+// final manipulated string according to constants/ id or just literal
+string finalString;
 
 // Function prototypes for the EBNF Tokens in bold
 bool parseProgram();
 bool parseStatement();
 bool parseExpression();
-bool parseValue();
+bool parseValue(string value);
 
 // Function prototypes for the Lexer tokens first keywords
 bool parseAppendStatement();
@@ -52,11 +58,41 @@ bool isWordValid(string word);
 bool isIdentifierValid(string identifier);
 bool checkIdentifierExists(string id);
 void declareConstants();
+void getNextToken();
+bool accept(string expected);
 
 // Global variables to help figure out if expression is either id|constant|literal
 bool exprIsID = false;
 bool exprIsLiteral = false;
 bool exprIsConstant = false;
+
+// Function to get next token in an expression for validation
+void getNextToken() {
+    // Get next token
+    if(!keyWords.empty() && nextToken != ";"){
+        nextToken = keyWords.front();
+        // Now erase token from the keyWords table
+        keyWords.erase(keyWords.begin());
+    } else {
+        nextToken = "\0";
+    }
+}
+
+// Function to work with parseExpression by accepting/checking if after value, next char is +
+bool accept(string expected){
+    cout << endl;
+    cout <<"accept()" << endl;
+    cout << endl;
+
+    // Get next token after value which should be + and return true
+    getNextToken();
+    cout <<"1: accepted getNextToken = " << nextToken << endl;
+    if(nextToken != expected) {
+        return false;
+    }
+
+    return true;
+}
 
 // Function to Declaring language constants and storing them in constants vector
 void declareConstants() {
@@ -370,7 +406,7 @@ bool parseAppendStatement(){
                 // If exprIsLiteral is false, it means expression is either ID/Constant
                 // Check if expression ID/Constant, for now lets pretend if not literal
                 // Now append since statement is valid 
-                if (!exprIsLiteral && checkIdentifierExists(express)){
+                if (!exprIsLiteral && !exprIsConstant && checkIdentifierExists(express)){
                     cout << "NOT String Literal, so ID" << endl;
                     for(auto &idName: ids){
                         if(idName.idName == express){
@@ -415,6 +451,53 @@ bool parseAppendStatement(){
             //keyWords.erase(keyWords.begin());
         //} 
         return false;    
+}
+
+// Function to parse Expression Recursively. Recursive Descent parser
+// Using expression := value + Expression | value (for recursiveness) 
+bool parseExpression(){
+    cout << endl;
+    cout <<"parseExpression()" << endl;
+    cout << endl;
+
+    // First Check if the nextToken is valid
+    getNextToken();
+    cout <<"1: Outside if getNextToken = " << nextToken << endl;
+
+    // Base Case
+    if(!parseValue(nextToken)){
+        cout <<"Value Invalid" << endl;
+        // token not valid
+        return false;
+    }
+
+    // Check if there are more tokens & if the next token is a +
+    if(!keyWords.empty() && keyWords.front() == "+"){
+        // Consume the '+' token
+        getNextToken();
+        cout <<"2: Consumed + next token = " << nextToken << endl;
+
+        // Recursively parseExpression since there is a + to make sure its followed by value
+        return parseExpression();
+    }
+
+    // If there is no +, reached the end of the expression
+    return true;
+}
+
+// Function to parseValue by checking if the value is a valid value or not
+bool parseValue(string value){
+    cout << endl;
+    cout <<"parseValue()" << endl;
+    cout << endl;
+    cout <<"Next Token = " << nextToken << endl;
+
+    // Check if value is string (For now just testing with literals)
+    if(exprIsLiteral){
+        return true;
+    }
+
+    return false;
 }
 
 // Function to empty the vector
