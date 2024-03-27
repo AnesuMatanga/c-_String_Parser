@@ -368,6 +368,7 @@ bool parseAppendStatement(){
             // Now check if the current keyword is valid
             if(keyWords.front() == ";"){
                 // If exprIsLiteral is false, it means expression is either ID/Constant
+                // Check if expression ID/Constant, for now lets pretend if not literal
                 // Now append since statement is valid 
                 if (!exprIsLiteral && checkIdentifierExists(express)){
                     cout << "NOT String Literal, so ID" << endl;
@@ -433,7 +434,7 @@ bool parseExitStatement(){
     return true;
 }
 
-// Function to parse list statement
+// Function to parse Print statement
 bool parsePrintStatement(){
 
     //Check if second keyword is what its supposed to be
