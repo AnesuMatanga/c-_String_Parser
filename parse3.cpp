@@ -33,7 +33,7 @@ vector<Expressions> expression;
 // Current position
 size_t position = 0; 
 // nextToken variable to work with parseExpression
-string nextToken;
+string nextToken = "";
 // final manipulated string according to constants/ id or just literal
 string finalString;
 
@@ -672,6 +672,7 @@ bool parseSetStatement(){
     std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
 
     string token = keyWords.front();
+    string manipulatedString = "";
     // Declare a struct to store the ids
     struct Ids id;
     //Check if its id is valid
@@ -688,15 +689,60 @@ bool parseSetStatement(){
         // For now, check the expression is valid 
         if (!keyWords.empty()){
             // Save the value of the id to later add to the vector ids
-            id.value = keyWords.front();
+            //id.value = keyWords.front();
             // Now save to the vector
-            ids.push_back(id);
-            cout <<"id.value = " << ids.back().value << endl;
+            // ids.push_back(id);
+            // cout <<"id.value = " << ids.back().value << endl;
+            
+            // Declare strings to hold expression name and type
+            string expressionWord;
+            string expressionType;
 
             // Remove the expression from the vector
-            keyWords.erase(keyWords.begin());
+            //keyWords.erase(keyWords.begin());
             // Now check if the current keyword is valid
-            if(keyWords.front() == ";"){
+            // Call parseExpression to pass the expression
+            if(keyWords.back() == ";" && parseExpression()){
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+                while(!expression.empty()){
+                    expressionWord = expression.front().exprName;
+                    expressionType = expression.front().type;
+
+                    // Now pop the expressionWord & Type off the table
+                    expression.erase(expression.begin());
+
+                    // Now append since statement is valid
+                    if (expressionType == "id"){
+                        cout << "NOT String Literal/constant, so ID" << endl;
+                        // Add id.value to string
+                        for (auto &idObj: ids) {
+                            if(idObj.idName == expressionWord){
+                                cout <<"idObj.value id = "<< idObj.value << endl;
+                                // Append contents
+                                manipulatedString += idObj.value;
+                            }
+                        }
+                        
+                    } else if (expressionType == "literal"){
+                        // Just add to the string
+                        manipulatedString += expressionWord;
+                    } else if (expressionType == "constant"){
+                        if(expressionWord == "SPACE"){
+                            manipulatedString += " ";
+                        }
+                        if(expressionWord == "TAB"){
+                            manipulatedString += "\t";
+                        }
+                        if (expressionWord == "NEWLINE"){
+                            manipulatedString += "\n";
+                        }
+                    }
+                }
+                // Now add to the ids vector
+                id.value = manipulatedString;
+                ids.push_back(id);
+                cout <<"id.value = " << ids.back().value << endl;
                 // Reached the end of the statement
                 return true;
             } else {

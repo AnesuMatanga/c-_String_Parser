@@ -118,6 +118,149 @@ bool parseValue(string value){
     return false;
 } 
 
+
+
+// Function to parse the append Statement
+bool parseAppendStatement(){
+    // Append then id then expression and end
+    //Check if second keyword is what its supposed to be
+    //Remove front() first by erasing
+
+    std::cout << endl;
+    std::cout <<"parseAppendStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    // Declare a struct to store the ids
+    string id = "";
+    string express = "";
+    // Check if its id is valid
+    if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
+        std::cout <<"ID: " << keyWords.front() << endl;
+        // Should be followed by expression which can be recursive
+
+        // Save the id
+        id = keyWords.front();
+        // Now check if Id is valid whose value going to be appended to
+        bool idExists = checkIdentifierExists(id);
+        if(!idExists){
+            return false;
+        }
+
+        // Remove the id and check the next expression
+        keyWords.erase(keyWords.begin());
+
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        cout <<"isExprLiteral?: " << exprIsLiteral << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty()){
+            express = keyWords.front();
+            // Remove the expression from the vector
+            //keyWords.erase(keyWords.begin());
+
+
+            // Declare strings to hold expression name and type
+            string expressionWord;
+            string expressionType;
+            // Call parseExpression to pass the expression
+            // Now check if the current keyword is valid
+            if(keyWords.back() == ";" && parseExpression()){
+                // If exprIsLiteral is false, it means expression is either ID/Constant
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+                while(!expression.empty()){
+                    expressionWord = expression.front().exprName;
+                    expressionType = expression.front().type;
+
+                    // Now pop the expressionWord and type off the table
+                    expression.erase(expression.begin());
+
+                    // Now append since statement is valid 
+                    if (expressionType == "id"){
+                        cout << "NOT String Literal/constant, so ID" << endl;
+                        for(auto &idName: ids){
+                            if(idName.idName == expressionWord){
+                                cout <<"idName.value express = "<< idName.value << endl;
+                                for(auto &idObj: ids){
+                                    if(idObj.idName == id){
+                                        cout <<"idObj.value id = "<< idObj.value << endl;
+                                        // Append contents
+                                        idObj.value += idName.value;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (expressionType == "literal"){
+                        // use & to alter the actual object
+                        for (auto &idName: ids){
+                            if (idName.idName == id){
+                                // Concatenta new expression to existing idValue
+                                idName.value += expressionWord;
+                            
+                            }
+                        }
+                    } else if (expressionType == "constant"){
+                        // use & to alter the actual object
+                        for (auto &idName: ids){
+                            if (idName.idName == id){
+                                // Concatenta new expression to existing idValue
+                                if(expressionWord == "SPACE"){
+                                    idName.value += " ";
+                                }
+                                if(expressionWord == "TAB"){
+                                    idName.value += "\t";
+                                }
+                                if(expressionWord == "NEWLINE"){
+                                    idName.value += "\n";
+                                }
+
+                            }
+                        }
+                    }
+                }
+            
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error: Expected 'id' identifier" << endl;
+        return false;
+    }
+        
+        // Pop again to check the last end of statement keyword
+        //if (!keyWords.empty()){
+            //keyWords.erase(keyWords.begin());
+        //} 
+        return false;    
+}
+
+
+
+
+
+
+
+
+
+
+
+
 int main() {
     input = "";
     while (input != "exit;"){
