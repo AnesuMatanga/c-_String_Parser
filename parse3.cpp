@@ -133,7 +133,7 @@ void countWords(const string& str){
     auto words_begin = sregex_iterator(str.begin(), str.end(), word_regex);
     auto words_end = sregex_iterator();
 
-    std::cout <<"Wordcount is: " << distance(words_begin, words_end) << " words" << endl;
+    std::cout <<"Wordcount is: " << distance(words_begin, words_end) << endl;
 }
 
 // Function to help resolve an expression to get a final string
@@ -716,6 +716,55 @@ bool parsePrintStatement(){
 
 // Function to parse list statement
 bool parsePrintLengthStatement(){
+
+      std::cout << endl;
+    std::cout <<"parsePrintWordsStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    string manipulatedString = "";
+    // Declare a struct to store the ids
+    struct Ids id;
+    //Check if its id is valid
+    if (!keyWords.empty()){
+        //Should be followed by expression which can be recursive
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty()){
+
+            // Call parseExpression to pass the expression
+            if(keyWords.back() == ";" && parseExpression()){
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+            
+                // Now print the words which conform to a specific pattern utilizing the regex library
+                manipulatedString = resolveExpression();
+                // Now printLength
+                cout <<"Length is: " << manipulatedString.length() << endl;
+
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error:Missing Expression after printwords" << endl;
+        return false;
+    }
     return true;
 }
 
