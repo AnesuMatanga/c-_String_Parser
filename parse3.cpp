@@ -229,6 +229,8 @@ bool getWordsVector(){
         if(isStringLiteral) {
             // Check if the last word is right next to ; without space
             if(word.back() == ';' && word.length() > 1 && word[word.length() - 2] == '"'){
+                // Update exprIsLiteral global var to indicate expression is literal
+                exprIsLiteral = true;
                 // Split the last word into two strings, for ; to be added to vector
                 stringLiteral += word.substr(0, word.length() - 2);
                 // Check if String Literal is valid fiorst before adding to vector
@@ -244,6 +246,8 @@ bool getWordsVector(){
                 // Check if the word ends with unescaped quote
                 // String is same as vector so can access it that way
             } else if(word.back() == '"' && (word.length() == 1 || word[word.length() - 2] != '\\')) {
+                // Update exprIsLiteral global var to indicate expression is literal
+                exprIsLiteral = true;
                 // Add to the string Literal, add to keyWords Vector
                 stringLiteral += word;
                 cout <<"# StringLiteralLength: " << stringLiteral.length() << endl;
@@ -257,8 +261,6 @@ bool getWordsVector(){
         } else {
             // Check if the word starts with quote "
             if(word.front() == '"'){
-                // Update exprIsLiteral global var to indicate expression is literal
-                exprIsLiteral = true;
 
                 // Start of stringLiteral so put to true
                 isStringLiteral = true;
