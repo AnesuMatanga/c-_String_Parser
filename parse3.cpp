@@ -89,13 +89,13 @@ void getNextToken() {
 
 // Function to work with parseExpression by accepting/checking if after value, next char is +
 bool accept(string expected){
-    cout << endl;
-    cout <<"accept()" << endl;
-    cout << endl;
+    std::cout << endl;
+    std::cout <<"accept()" << endl;
+    std::cout << endl;
 
     // Get next token after value which should be + and return true
     getNextToken();
-    cout <<"1: accepted getNextToken = " << nextToken << endl;
+    std::cout <<"1: accepted getNextToken = " << nextToken << endl;
     if(nextToken != expected) {
         return false;
     }
@@ -115,11 +115,11 @@ void printWords(const string& str){
     auto words_end = sregex_iterator();
 
     //cout <<"Found " << distance(words_begin, words_end) << " words" << endl;
-    cout <<"Words are: " << endl;
+    std::cout <<"Words are: " << endl;
     // Now iterate over all matches and print each word
     for (sregex_iterator i = words_begin; i != words_end; i++){
         smatch match = *i;
-        cout << match.str() << endl;
+        std::cout << match.str() << endl;
     }
 }
 
@@ -133,7 +133,7 @@ void countWords(const string& str){
     auto words_begin = sregex_iterator(str.begin(), str.end(), word_regex);
     auto words_end = sregex_iterator();
 
-    cout <<"Wordcount is: " << distance(words_begin, words_end) << " words" << endl;
+    std::cout <<"Wordcount is: " << distance(words_begin, words_end) << " words" << endl;
 }
 
 // Function to help resolve an expression to get a final string
@@ -150,8 +150,8 @@ string resolveExpression(){
         expression.erase(expression.begin());
 
         // Now append since statement is valid
-        if (expressionType == "id"){
-            std::cout << "NOT String Literal/constant, so ID" << endl;
+        if (expressionType == "id"){    
+           std::cout << "NOT String Literal/constant, so ID" << endl;
             // Add id.value to string
             for (auto &idObj: ids) {
                 if(idObj.idName == expressionWord){
@@ -191,12 +191,12 @@ void declareConstants() {
 bool checkIdentifierExists(string id){
     bool doesExist = false;
 
-    cout << endl;
-    cout <<"checkIdentifierExists" << endl;
-    cout << endl;
+    std::cout << endl;
+    std::cout <<"checkIdentifierExists" << endl;
+    std::cout << endl;
 
     for(const auto& idNm: ids){
-        cout <<"idName: " << idNm.idName << endl;
+        std::cout <<"idName: " << idNm.idName << endl;
     }
 
     // Use for loop to traverse the vector
@@ -209,7 +209,7 @@ bool checkIdentifierExists(string id){
 
     // Error message if idName not matched
     if(!doesExist){
-        cout <<"Error: Stated identifier invalid or not set." << endl;
+        std::cout <<"Error: Stated identifier invalid or not set." << endl;
     }
 
     return doesExist;
@@ -230,9 +230,9 @@ bool isSpecialCharacter(char c){
 bool isIdentifierValid(string identifier){
     bool isValid = true;
 
-    cout << endl;
-    cout << "isIdentifierValid" << endl;
-    cout << endl;
+    std::cout << endl;
+    std::cout << "isIdentifierValid" << endl;
+    std::cout << endl;
     // Declare the regex object id_regex
     const regex id_regex("[a-zA-Z][a-zA-Z0-9]*");
 
@@ -240,9 +240,9 @@ bool isIdentifierValid(string identifier){
     if(!regex_match(identifier, id_regex)){
         // Error
         isValid = false;
-        cout <<"Error: Invalid, Identifier doesnt match correct pattern" << endl;
+        std::cout <<"Error: Invalid, Identifier doesnt match correct pattern" << endl;
     } else {
-        cout <<"Identifier pattern CORRECT" << endl;
+        std::cout <<"Identifier pattern CORRECT" << endl;
     }
     
     return isValid;
@@ -253,9 +253,9 @@ bool isIdentifierValid(string identifier){
 bool isWordValid(string word){
     bool isValid = true;
 
-    cout << endl;
-    cout <<"isWordValid()" << endl;
-    cout << endl;
+    std::cout << endl;
+    std::cout <<"isWordValid()" << endl;
+    std::cout << endl;
 
     // Declare & instantiate string literal expression regex object
     //const regex expression_regex(R"("[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*(\\\")?[a-zA-Z0-9\s@!~`#$%^&*()_\-+={}\[\]|/><,.;:?']*")");
@@ -270,9 +270,9 @@ bool isWordValid(string word){
     if(!regex_match(word, expression_regex)){
         isValid = false;
         // Error, invalid stringLiteral
-        cout <<"Error: String Literal invalid, doesnt match pattern" << endl;
+        std::cout <<"Error: String Literal invalid, doesnt match pattern" << endl;
     } else {
-        cout <<"String Literal expression CORRECT" << endl;
+        std::cout <<"String Literal expression CORRECT" << endl;
     }
     std::cout <<"Word is Valid?: " << isValid << endl;
     return isValid;
@@ -316,7 +316,7 @@ bool getWordsVector(){
                 isStringValid = isWordValid(stringLiteral);
                 // Now take the substr without the string open and close quotes
                 stringLiteral = stringLiteral.substr(1, stringLiteral.length() - 1);
-                cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
+                std::cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
                 // Add the substrings to keyWord vector
                 keyWords.push_back(stringLiteral);
                 keyWords.push_back(";");
@@ -329,7 +329,7 @@ bool getWordsVector(){
                 exprIsLiteral = true;
                 // Add to the string Literal, add to keyWords Vector
                 stringLiteral += word;
-                cout <<"# StringLiteralLength: " << stringLiteral.length() << endl;
+                std::cout <<"# StringLiteralLength: " << stringLiteral.length() << endl;
                 keyWords.push_back(stringLiteral.substr(1, stringLiteral.length()-2));
                 // Reached the end of literal, so put isStringLiteral to false
                 isStringLiteral = false; 
@@ -344,7 +344,7 @@ bool getWordsVector(){
                 // Start of stringLiteral so put to true
                 isStringLiteral = true;
                 //stringLiteral = word + " ";
-                cout <<"Word.length() - 2 = " << word[word.length() - 2] << endl;
+                std::cout <<"Word.length() - 2 = " << word[word.length() - 2] << endl;
                 // Special case, check for string literal with only one word
                 if((word.back() == '"' || (word.back() == ';' && word[word.length() - 2] == '"')) && word.length() > 1) {
                      // Split the last word into two strings, for ; to be added to vector
@@ -353,7 +353,7 @@ bool getWordsVector(){
                     isStringValid = isWordValid(stringLiteral);
                     // Now take the substr without the string open and close quotes
                     stringLiteral = stringLiteral.substr(1, stringLiteral.length() - 2);
-                    cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
+                    std::cout <<"STRINGLITERAL Without quotes: " << stringLiteral << endl;
                     // Add the substrings to keyWord vector
                     keyWords.push_back(stringLiteral);
                     keyWords.push_back(";");
@@ -448,17 +448,17 @@ bool parseStatement() {
 // Function to parse Expression Recursively. Recursive Descent parser
 // Using expression := value + Expression | value (for recursiveness) 
 bool parseExpression(){
-    cout << endl;
-    cout <<"parseExpression()" << endl;
-    cout << endl;
+    std::cout << endl;
+    std::cout <<"parseExpression()" << endl;
+    std::cout << endl;
 
     // First Check if the nextToken is valid
     getNextToken();
-    cout <<"1: Outside if getNextToken = " << nextToken << endl;
+    std::cout <<"1: Outside if getNextToken = " << nextToken << endl;
 
     // Base Case
     if(!parseValue(nextToken)){
-        cout <<"Error: Value Invalid, missing value after + sign to append" << endl;
+        std::cout <<"Error: Value Invalid, missing value after + sign to append" << endl;
         // token not valid
         return false;
     }
@@ -467,7 +467,7 @@ bool parseExpression(){
     if(!keyWords.empty() && keyWords.front() == "+"){
         // Consume the '+' token
         getNextToken();
-        cout <<"2: Consumed + next token = " << nextToken << endl;
+        std::cout <<"2: Consumed + next token = " << nextToken << endl;
 
         // Recursively parseExpression since there is a + to make sure its followed by value
         return parseExpression();
@@ -479,16 +479,16 @@ bool parseExpression(){
 
 // Function to parseValue by checking if the value is a valid value or not
 bool parseValue(string value){
-    cout << endl;
-    cout <<"parseValue()" << endl;
-    cout << endl;
-    cout <<"Next Token = " << nextToken << endl;
+    std::cout << endl;
+    std::cout <<"parseValue()" << endl;
+    std::cout << endl;
+    std::cout <<"Next Token = " << nextToken << endl;
 
     // Declare a struct to store the expression types
     Expressions express;
     // Check if value is string (For now just testing with literals)
     if(exprIsLiteral){
-        cout <<"Is String" << endl;
+        std::cout <<"Is String" << endl;
         // Add string to expressions table for later manipulation
         express.type = "literal";
         express.exprName = value;
@@ -496,13 +496,13 @@ bool parseValue(string value){
         return true;
     } else if (value == "SPACE" || value == "TAB" || value == "NEWLINE"){
         exprIsConstant = true;
-        cout <<"Is Constant" << endl;
+        std::cout <<"Is Constant" << endl;
         express.type = "constant";
         express.exprName = value;
         expression.push_back(express);
         return true;
     } else if(checkIdentifierExists(value)){
-        cout <<"Is ID" << endl;
+        std::cout <<"Is ID" << endl;
         exprIsID = true;
         express.type = "id";
         express.exprName = value;
@@ -554,7 +554,7 @@ bool parseAppendStatement(){
         keyWords.erase(keyWords.begin());
 
         std::cout <<"Expression: " << keyWords.front() << endl;
-        cout <<"isExprLiteral?: " << exprIsLiteral << endl;
+        std::cout <<"isExprLiteral?: " << exprIsLiteral << endl;
         // For now, check the expression is valid 
         if (!keyWords.empty()){
             express = keyWords.front();
@@ -580,13 +580,13 @@ bool parseAppendStatement(){
 
                     // Now append since statement is valid 
                     if (expressionType == "id"){
-                        cout << "NOT String Literal/constant, so ID" << endl;
+                        std::cout << "NOT String Literal/constant, so ID" << endl;
                         for(auto &idName: ids){
                             if(idName.idName == expressionWord){
-                                cout <<"idName.value express = "<< idName.value << endl;
+                                std::cout <<"idName.value express = "<< idName.value << endl;
                                 for(auto &idObj: ids){
                                     if(idObj.idName == id){
-                                        cout <<"idObj.value id = "<< idObj.value << endl;
+                                        std::cout <<"idObj.value id = "<< idObj.value << endl;
                                         // Append contents
                                         idObj.value += idName.value;
                                     }
@@ -696,8 +696,8 @@ bool parsePrintStatement(){
             for(auto &idName: ids){
                 if(idName.idName == express){
                     // Print it out
-                    cout <<"ID Name: " << idName.idName << endl;
-                    cout <<"ID Value: " << idName.value << endl;
+                    std::cout <<"ID Name: " << idName.idName << endl;
+                    std::cout <<"ID Value: " << idName.value << endl;
 
                     // Reached the end of the statement
                     return true;
@@ -721,9 +721,6 @@ bool parsePrintLengthStatement(){
 
 // Function to parse list statement
 bool parsePrintWordsStatement(){
-    // Append then id then expression and end
-    //Check if second keyword is what its supposed to be
-    //Remove front() first by erasing
 
     std::cout << endl;
     std::cout <<"parsePrintWordsStatement()" << endl;
@@ -749,6 +746,7 @@ bool parsePrintWordsStatement(){
         std::cout <<"Expression: " << keyWords.front() << endl;
         // For now, check the expression is valid 
         if (!keyWords.empty()){
+
             // Call parseExpression to pass the expression
             if(keyWords.back() == ";" && parseExpression()){
                 // Check if expression ID/Constant, for now lets pretend if not literal
@@ -778,6 +776,55 @@ bool parsePrintWordsStatement(){
 
 // Function to parse list statement
 bool parsePrintWordCountStatement(){
+
+    std::cout << endl;
+    std::cout <<"parsePrintWordCountStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    string manipulatedString = "";
+    // Declare a struct to store the ids
+    struct Ids id;
+    //Check if its id is valid
+    if (!keyWords.empty()){
+        //Should be followed by expression which can be recursive
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty()){
+
+            // Call parseExpression to pass the expression
+            if(keyWords.back() == ";" && parseExpression()){
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+            
+                // Now print the words which conform to a specific pattern utilizing the regex library
+                manipulatedString = resolveExpression();
+                countWords(manipulatedString);
+
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error:Missing Expression after printwords" << endl;
+        return false;
+    }
+
     return true;
 }
 
@@ -845,11 +892,11 @@ bool parseSetStatement(){
 
                     // Now append since statement is valid
                     if (expressionType == "id"){
-                        cout << "NOT String Literal/constant, so ID" << endl;
+                        std::cout << "NOT String Literal/constant, so ID" << endl;
                         // Add id.value to string
                         for (auto &idObj: ids) {
                             if(idObj.idName == expressionWord){
-                                cout <<"idObj.value id = "<< idObj.value << endl;
+                                std::cout <<"idObj.value id = "<< idObj.value << endl;
                                 // Append contents
                                 manipulatedString += idObj.value;
                             }
@@ -873,7 +920,7 @@ bool parseSetStatement(){
                 // Now add to the ids vector
                 id.value = manipulatedString;
                 ids.push_back(id);
-                cout <<"id.value = " << ids.back().value << endl;
+                std::cout <<"id.value = " << ids.back().value << endl;
                 // Reached the end of the statement
                 return true;
             } else {
