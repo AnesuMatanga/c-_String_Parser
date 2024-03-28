@@ -66,6 +66,8 @@ bool checkIdentifierExists(string id);
 void declareConstants();
 void getNextToken();
 bool accept(string expected);
+void printWords(const string& str);
+void countWords(const string& str);
 
 // Global variables to help figure out if expression is either id|constant|literal
 bool exprIsID = false;
@@ -98,6 +100,39 @@ bool accept(string expected){
     }
 
     return true;
+}
+
+// Function to Print words utilizing the regex library for specific word pattern matching
+void printWords(const string& str){
+    // Declaring regex object with the pattern
+    // Recall where you learnt this: https://cplusplus.com/reference/regex/ECMAScript/
+    // \\b is for word boundary and pattern matches words that contain ' and -
+    regex word_regex(R"(\b['\w-]+\b)");
+
+    // Will use a regex iterator to be able to count words which match pattern
+    auto words_begin = sregex_iterator(str.begin(), str.end(), word_regex);
+    auto words_end = sregex_iterator();
+
+    //cout <<"Found " << distance(words_begin, words_end) << " words" << endl;
+    cout <<"Words are: " << endl;
+    // Now iterate over all matches and print each word
+    for (sregex_iterator i = words_begin; i != words_end; i++){
+        smatch match = *i;
+        cout << match.str() << endl;
+    }
+}
+
+// Function to count the number of words which match the word boundary for the language
+// Using const to avoid modifying the string and & to avoid copying for performance
+void countWords(const string& str){
+    // \\b is for word boundary and pattern matches words that contain ' and -
+    regex word_regex(R"(\b['\w-]+\b)");
+
+    // Will use a regex iterator to be able to count words which match pattern
+    auto words_begin = sregex_iterator(str.begin(), str.end(), word_regex);
+    auto words_end = sregex_iterator();
+
+    cout <<"Wordcount is: " << distance(words_begin, words_end) << " words" << endl;
 }
 
 // Function to Declaring language constants and storing them in constants vector
@@ -642,8 +677,105 @@ bool parsePrintLengthStatement(){
 
 // Function to parse list statement
 bool parsePrintWordsStatement(){
+    // Append then id then expression and end
+    //Check if second keyword is what its supposed to be
+    //Remove front() first by erasing
+
+    std::cout << endl;
+    std::cout <<"parsePrintWordsStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    string token = keyWords.front();
+    string manipulatedString = "";
+    // Declare a struct to store the ids
+    struct Ids id;
+    //Check if its id is valid
+    if (!keyWords.empty()){
+        //Should be followed by expression which can be recursive
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty()){
+            // Save the value of the id to later add to the vector ids
+            //id.value = keyWords.front();
+            // Now save to the vector
+            // ids.push_back(id);
+            // cout <<"id.value = " << ids.back().value << endl;
+            
+            // Declare strings to hold expression name and type
+            string expressionWord;
+            string expressionType;
+
+            // Remove the expression from the vector
+            //keyWords.erase(keyWords.begin());
+            // Now check if the current keyword is valid
+            // Call parseExpression to pass the expression
+            if(keyWords.back() == ";" && parseExpression()){
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+                while(!expression.empty()){
+                    expressionWord = expression.front().exprName;
+                    expressionType = expression.front().type;
+
+                    // Now pop the expressionWord & Type off the table
+                    expression.erase(expression.begin());
+
+                    // Now append since statement is valid
+                    if (expressionType == "id"){
+                        cout << "NOT String Literal/constant, so ID" << endl;
+                        // Add id.value to string
+                        for (auto &idObj: ids) {
+                            if(idObj.idName == expressionWord){
+                                cout <<"idObj.value id = "<< idObj.value << endl;
+                                // Append contents
+                                manipulatedString += idObj.value;
+                            }
+                        }
+                        
+                    } else if (expressionType == "literal"){
+                        // Just add to the string
+                        manipulatedString += expressionWord;
+                    } else if (expressionType == "constant"){
+                        if(expressionWord == "SPACE"){
+                            manipulatedString += " ";
+                        }
+                        if(expressionWord == "TAB"){
+                            manipulatedString += "\t";
+                        }
+                        if (expressionWord == "NEWLINE"){
+                            manipulatedString += "\n";
+                        }
+                    }
+                }
+                // Now print the words which conform to a specific pattern utilizing the regex library
+                printWords(manipulatedString);
+
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
+            }
+        }
+    } else {
+        // Error Handling
+        std::cout <<"Error:Missing Expression after printwords" << endl;
+        return false;
+    }
+           
     return true;
 }
+
 
 // Function to parse list statement
 bool parsePrintWordCountStatement(){
@@ -653,7 +785,7 @@ bool parsePrintWordCountStatement(){
 // Function to parse list statement
 bool parseSetStatement(){
 
-     // Append then id then expression and end
+    // Append then id then expression and end
     //Check if second keyword is what its supposed to be
     //Remove front() first by erasing
 
