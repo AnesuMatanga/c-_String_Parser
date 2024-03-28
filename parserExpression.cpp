@@ -98,9 +98,9 @@ bool parseValue(string value){
     cout << endl;
     cout <<"Next Token = " << nextToken << endl;
     // Check if value is string
-    if(value.front() == '"'){
+    if(exprIsLiteral){
         cout <<"Is String" << endl;
-        exprIsLiteral = true;
+        exprIsLiteral = true;      
         return true;
         // Check if value is constant
     } else if (value == "SPACE" || value == "TAB" || value == "NEWLINE"){

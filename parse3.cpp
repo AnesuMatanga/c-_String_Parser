@@ -13,6 +13,12 @@ struct Ids {
     string value;
 };
 
+// Declaring a struct to keep track of the types in an expression
+struct Expressions {
+    string type;
+    string exprName;
+};
+
 // Global Variables
 string input;
 // Vector with keywords
@@ -22,7 +28,7 @@ vector<Ids> ids;
 // Vector to store language constants
 vector<string> constants;
 // Vector to store expression word by word
-vector<string> expression;
+vector<Expressions> expression;
 
 // Current position
 size_t position = 0; 
@@ -52,7 +58,7 @@ bool parseReverseStatement();
 bool getWordsVector();
 
 // Other Helper Functions Prototypes
-void emptyVector();
+//void emptyVector();
 bool isSpecialCharacter(char c);
 bool isWordValid(string word);
 bool isIdentifierValid(string identifier);
@@ -205,6 +211,8 @@ bool getWordsVector(){
     bool isValidWord = true;
     bool isStringValid = false;
     exprIsLiteral = false;
+    exprIsConstant = false;
+    exprIsID = false;
     
     std::cout << endl;
     std::cout <<"getWordsVector()" << endl;
@@ -354,6 +362,74 @@ bool parseStatement() {
     }
 }
 
+// Function to parse Expression Recursively. Recursive Descent parser
+// Using expression := value + Expression | value (for recursiveness) 
+bool parseExpression(){
+    cout << endl;
+    cout <<"parseExpression()" << endl;
+    cout << endl;
+
+    // First Check if the nextToken is valid
+    getNextToken();
+    cout <<"1: Outside if getNextToken = " << nextToken << endl;
+
+    // Base Case
+    if(!parseValue(nextToken)){
+        cout <<"Value Invalid" << endl;
+        // token not valid
+        return false;
+    }
+
+    // Check if there are more tokens & if the next token is a +
+    if(!keyWords.empty() && keyWords.front() == "+"){
+        // Consume the '+' token
+        getNextToken();
+        cout <<"2: Consumed + next token = " << nextToken << endl;
+
+        // Recursively parseExpression since there is a + to make sure its followed by value
+        return parseExpression();
+    }
+
+    // If there is no +, reached the end of the expression
+    return true;
+}
+
+// Function to parseValue by checking if the value is a valid value or not
+bool parseValue(string value){
+    cout << endl;
+    cout <<"parseValue()" << endl;
+    cout << endl;
+    cout <<"Next Token = " << nextToken << endl;
+
+    // Declare a struct to store the expression types
+    Expressions express;
+    // Check if value is string (For now just testing with literals)
+    if(exprIsLiteral){
+        cout <<"Is String" << endl;
+        // Add string to expressions table for later manipulation
+        express.type = "literal";
+        express.exprName = value;
+        expression.push_back(express);
+        return true;
+    } else if (value == "SPACE" || value == "TAB" || value == "NEWLINE"){
+        exprIsConstant = true;
+        cout <<"Is Constant" << endl;
+        express.type = "constant";
+        express.exprName = value;
+        expression.push_back(express);
+        return true;
+    } else if(checkIdentifierExists(value)){
+        cout <<"Is ID" << endl;
+        exprIsID = true;
+        express.type = "id";
+        express.exprName = value;
+        expression.push_back(express);
+        return true;
+    }
+
+    return false;
+}
+
 // Function to parse the append Statement
 bool parseAppendStatement(){
     // Append then id then expression and end
@@ -400,40 +476,63 @@ bool parseAppendStatement(){
         if (!keyWords.empty()){
             express = keyWords.front();
             // Remove the expression from the vector
-            keyWords.erase(keyWords.begin());
+            //keyWords.erase(keyWords.begin());
+
+
+            // Declare strings to hold expression name and type
+            string expressionWord;
+            string expressionType;
+            // Call parseExpression to pass the expression
             // Now check if the current keyword is valid
-            if(keyWords.front() == ";"){
+            if(keyWords.back() == ";" && parseExpression()){
                 // If exprIsLiteral is false, it means expression is either ID/Constant
                 // Check if expression ID/Constant, for now lets pretend if not literal
-                // Now append since statement is valid 
-                if (!exprIsLiteral && !exprIsConstant && checkIdentifierExists(express)){
-                    cout << "NOT String Literal, so ID" << endl;
-                    for(auto &idName: ids){
-                        if(idName.idName == express){
-                            cout <<"idName.value express = "<< idName.value << endl;
-                            for(auto &idObj: ids){
-                                if(idObj.idName == id){
-                                    cout <<"idObj.value id = "<< idObj.value << endl;
-                                    // Append contents
-                                    idObj.value += idName.value;
+                // Get first word in expression and check its type to manipulate
+                while(!expression.empty()){
+                    expressionWord = expression.front().exprName;
+                    expressionType = expression.front().type;
+
+                    // Now pop the expressionWord and type off the table
+                    expression.erase(expression.begin());
+
+                    // Now append since statement is valid 
+                    if (expressionType == "id"){
+                        cout << "NOT String Literal/constant, so ID" << endl;
+                        for(auto &idName: ids){
+                            if(idName.idName == expressionWord){
+                                cout <<"idName.value express = "<< idName.value << endl;
+                                for(auto &idObj: ids){
+                                    if(idObj.idName == id){
+                                        cout <<"idObj.value id = "<< idObj.value << endl;
+                                        // Append contents
+                                        idObj.value += idName.value;
+                                    }
                                 }
                             }
-                            // Reached the end of the statement
-                            return true;
                         }
-                    }
-                } else {
-                    // use & to alter the actual object
-                    for (auto &idName: ids){
-                        if (idName.idName == id){
-                            // Concatenta new expression to existing idValue
-                            idName.value += express;
+                    } else if (expressionType == "literal"){
+                        // use & to alter the actual object
+                        for (auto &idName: ids){
+                            if (idName.idName == id){
+                                // Concatenta new expression to existing idValue
+                                idName.value += expressionWord;
+                            
+                            }
+                        }
+                    } else if (expressionType == "constant"){
+                        // use & to alter the actual object
+                        for (auto &idName: ids){
+                            if (idName.idName == id){
+                                // Concatenta new expression to existing idValue
+                                idName.value += expressionWord;
 
-                            // Reached the end of the statement
-                            return true;
+                            }
                         }
                     }
                 }
+            
+                // Reached the end of the statement
+                return true;
             } else {
                 // Error Handling
                 std::cout <<"Error: Expected end of statement identifier" << endl;
@@ -453,58 +552,12 @@ bool parseAppendStatement(){
         return false;    
 }
 
-// Function to parse Expression Recursively. Recursive Descent parser
-// Using expression := value + Expression | value (for recursiveness) 
-bool parseExpression(){
-    cout << endl;
-    cout <<"parseExpression()" << endl;
-    cout << endl;
 
-    // First Check if the nextToken is valid
-    getNextToken();
-    cout <<"1: Outside if getNextToken = " << nextToken << endl;
-
-    // Base Case
-    if(!parseValue(nextToken)){
-        cout <<"Value Invalid" << endl;
-        // token not valid
-        return false;
-    }
-
-    // Check if there are more tokens & if the next token is a +
-    if(!keyWords.empty() && keyWords.front() == "+"){
-        // Consume the '+' token
-        getNextToken();
-        cout <<"2: Consumed + next token = " << nextToken << endl;
-
-        // Recursively parseExpression since there is a + to make sure its followed by value
-        return parseExpression();
-    }
-
-    // If there is no +, reached the end of the expression
-    return true;
-}
-
-// Function to parseValue by checking if the value is a valid value or not
-bool parseValue(string value){
-    cout << endl;
-    cout <<"parseValue()" << endl;
-    cout << endl;
-    cout <<"Next Token = " << nextToken << endl;
-
-    // Check if value is string (For now just testing with literals)
-    if(exprIsLiteral){
-        return true;
-    }
-
-    return false;
-}
-
-// Function to empty the vector
-void emptyVector(){
-    while(!keyWords.empty()){
-        keyWords.pop_back();
-    }
+// Function to empty any vector
+template <typename T>
+void emptyVector(vector<T>& vec){
+    // Empty vector
+    vec.clear();
 }
 
 // Function to parse list statement
@@ -720,8 +773,9 @@ int main() {
             std::cout << "Error: The string does not belong to the language." << endl;
         }
 
-        // Empty Vector
-        emptyVector();
+        // Empty Vectors
+        emptyVector(keyWords);
+        emptyVector(expression);
     }
 
     return 0;
