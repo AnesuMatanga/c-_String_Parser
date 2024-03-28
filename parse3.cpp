@@ -68,6 +68,7 @@ void getNextToken();
 bool accept(string expected);
 void printWords(const string& str);
 void countWords(const string& str);
+string resolveExpression();
 
 // Global variables to help figure out if expression is either id|constant|literal
 bool exprIsID = false;
@@ -133,6 +134,49 @@ void countWords(const string& str){
     auto words_end = sregex_iterator();
 
     cout <<"Wordcount is: " << distance(words_begin, words_end) << " words" << endl;
+}
+
+// Function to help resolve an expression to get a final string
+string resolveExpression(){
+
+    string manipulatedString = "";
+    string expressionWord;
+    string expressionType;
+    while(!expression.empty()){
+        expressionWord = expression.front().exprName;
+        expressionType = expression.front().type;
+
+        // Now pop the expressionWord & Type off the table
+        expression.erase(expression.begin());
+
+        // Now append since statement is valid
+        if (expressionType == "id"){
+            std::cout << "NOT String Literal/constant, so ID" << endl;
+            // Add id.value to string
+            for (auto &idObj: ids) {
+                if(idObj.idName == expressionWord){
+                    std::cout <<"idObj.value id = "<< idObj.value << endl;
+                    // Append contents
+                    manipulatedString += idObj.value;
+                }
+            }
+                        
+        } else if (expressionType == "literal"){
+            // Just add to the string
+            manipulatedString += expressionWord;
+        } else if (expressionType == "constant"){
+            if(expressionWord == "SPACE"){
+                manipulatedString += " ";
+            }
+            if(expressionWord == "TAB"){
+                 manipulatedString += "\t";
+            }
+            if (expressionWord == "NEWLINE"){
+                manipulatedString += "\n";
+            }
+        }
+    }
+    return manipulatedString;
 }
 
 // Function to Declaring language constants and storing them in constants vector
@@ -705,58 +749,13 @@ bool parsePrintWordsStatement(){
         std::cout <<"Expression: " << keyWords.front() << endl;
         // For now, check the expression is valid 
         if (!keyWords.empty()){
-            // Save the value of the id to later add to the vector ids
-            //id.value = keyWords.front();
-            // Now save to the vector
-            // ids.push_back(id);
-            // cout <<"id.value = " << ids.back().value << endl;
-            
-            // Declare strings to hold expression name and type
-            string expressionWord;
-            string expressionType;
-
-            // Remove the expression from the vector
-            //keyWords.erase(keyWords.begin());
-            // Now check if the current keyword is valid
             // Call parseExpression to pass the expression
             if(keyWords.back() == ";" && parseExpression()){
                 // Check if expression ID/Constant, for now lets pretend if not literal
                 // Get first word in expression and check its type to manipulate
-                while(!expression.empty()){
-                    expressionWord = expression.front().exprName;
-                    expressionType = expression.front().type;
-
-                    // Now pop the expressionWord & Type off the table
-                    expression.erase(expression.begin());
-
-                    // Now append since statement is valid
-                    if (expressionType == "id"){
-                        cout << "NOT String Literal/constant, so ID" << endl;
-                        // Add id.value to string
-                        for (auto &idObj: ids) {
-                            if(idObj.idName == expressionWord){
-                                cout <<"idObj.value id = "<< idObj.value << endl;
-                                // Append contents
-                                manipulatedString += idObj.value;
-                            }
-                        }
-                        
-                    } else if (expressionType == "literal"){
-                        // Just add to the string
-                        manipulatedString += expressionWord;
-                    } else if (expressionType == "constant"){
-                        if(expressionWord == "SPACE"){
-                            manipulatedString += " ";
-                        }
-                        if(expressionWord == "TAB"){
-                            manipulatedString += "\t";
-                        }
-                        if (expressionWord == "NEWLINE"){
-                            manipulatedString += "\n";
-                        }
-                    }
-                }
+            
                 // Now print the words which conform to a specific pattern utilizing the regex library
+                manipulatedString = resolveExpression();
                 printWords(manipulatedString);
 
                 // Reached the end of the statement
