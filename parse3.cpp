@@ -375,7 +375,7 @@ bool parseExpression(){
 
     // Base Case
     if(!parseValue(nextToken)){
-        cout <<"Value Invalid" << endl;
+        cout <<"Error: Value Invalid, missing value after + sign to append" << endl;
         // token not valid
         return false;
     }
@@ -524,7 +524,15 @@ bool parseAppendStatement(){
                         for (auto &idName: ids){
                             if (idName.idName == id){
                                 // Concatenta new expression to existing idValue
-                                idName.value += expressionWord;
+                                if(expressionWord == "SPACE"){
+                                    idName.value += " ";
+                                }
+                                if(expressionWord == "TAB"){
+                                    idName.value += "\t";
+                                }
+                                if(expressionWord == "NEWLINE"){
+                                    idName.value += "\n";
+                                }
 
                             }
                         }
