@@ -245,7 +245,9 @@ bool getWordsVector(){
                 // String is same as vector so can access it that way
             } else if(word.back() == '"' && (word.length() == 1 || word[word.length() - 2] != '\\')) {
                 // Add to the string Literal, add to keyWords Vector
-                keyWords.push_back(stringLiteral);
+                stringLiteral += word;
+                cout <<"# StringLiteralLength: " << stringLiteral.length() << endl;
+                keyWords.push_back(stringLiteral.substr(1, stringLiteral.length()-2));
                 // Reached the end of literal, so put isStringLiteral to false
                 isStringLiteral = false; 
             } else {
@@ -277,7 +279,7 @@ bool getWordsVector(){
                     // Stop looping 
                     isStringLiteral = false;
                 } else {
-                    stringLiteral = word + " ";
+                    stringLiteral = word.substr() + " ";
                 }
             } else {
                 // Add regular words(commands like append) to the vector
