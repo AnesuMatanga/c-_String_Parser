@@ -39,6 +39,8 @@ size_t position = 0;
 string nextToken = "";
 // final manipulated string according to constants/ id or just literal
 string finalString;
+// variable to check if user wants to exit
+bool isExit = false;
 
 // Function prototypes for the EBNF Tokens in bold
 bool parseProgram();
@@ -674,8 +676,27 @@ bool parseListStatement(){
 
 // Function to parse list statement
 bool parseExitStatement(){
-    exit;
-    return true;
+    std::cout << endl;
+    std::cout <<"parseExitStatement()" << endl;
+    std::cout << endl;
+
+    //DEBUG
+    std::cout <<"Keywords: " << endl;
+    for (const auto& keyword: keyWords){
+        std::cout << keyword << " ";
+    }
+    std::cout << endl;
+    std::cout <<"Front keyword b4 erasing: " << keyWords.front() << endl;
+    keyWords.erase(keyWords.begin());
+    std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
+
+    if(!keyWords.empty() && keyWords.front() == ";" && keyWords.size() == 1){
+        isExit = true;
+        return true;
+    }
+    // Error
+    cout <<"Error: Exit Statement invalid" << endl;
+    return false;
 }
 
 // Function to parse Print statement
@@ -942,6 +963,7 @@ bool parseSetStatement(){
             // Declare strings to hold expression name and type
             string expressionWord;
             string expressionType;
+            bool alreadySet = false;
 
             // Remove the expression from the vector
             //keyWords.erase(keyWords.begin());
@@ -950,6 +972,21 @@ bool parseSetStatement(){
             if(keyWords.back() == ";" && parseExpression()){
                 // Check if expression ID/Constant, for now lets pretend if not literal
                 // Get first word in expression and check its type to manipulate
+                // Check if the id to set is already taken if so overwrite it
+                if(!ids.empty()){
+                    // Allow overwrite of id
+                    for(auto &idName: ids){
+                        if(idName.idName == id.idName){
+                            idName.value = "";
+                            alreadySet = true;
+                        }
+                    }
+                }
+
+                if (alreadySet == false){
+                    ids.push_back(id);
+                    keyWords.erase(keyWords.begin());
+                }
                 while(!expression.empty()){
                     expressionWord = expression.front().exprName;
                     expressionType = expression.front().type;
@@ -1091,7 +1128,7 @@ int main() {
     declareConstants();
 
     input = "";
-    while (input != "exit;"){
+    while (!isExit){
         std::cout << "Enter a string: ";
         getline(cin, input);
         std::cout << "While Input: " << input << endl;
