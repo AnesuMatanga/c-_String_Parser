@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cctype>
 #include <regex>
+#include <algorithm>
 
 using namespace std;
 
@@ -29,6 +30,8 @@ vector<Ids> ids;
 vector<string> constants;
 // Vector to store expression word by word
 vector<Expressions> expression;
+// Vector to store words to later reverse
+vector<string> words;
 
 // Current position
 size_t position = 0; 
@@ -653,19 +656,29 @@ void emptyVector(vector<T>& vec){
 
 // Function to parse list statement
 bool parseListStatement(){
-    return true;
+    // Check if ids list not empty first
+    if(!ids.empty()){
+        // List everything
+        cout <<"Identififer list(" << ids.size() <<"):" << endl;
+        for(const auto &id: ids){
+            cout <<id.idName <<": " <<"\"" <<id.value <<"\"" << endl;
+        }
+        return true;
+    }
+    //Error
+    cout <<"Error: No Id's set yet, empty list" << endl;
+    
+    return false;
 }
 
 // Function to parse list statement
 bool parseExitStatement(){
+    exit;
     return true;
 }
 
 // Function to parse Print statement
 bool parsePrintStatement(){
-
-    //Check if second keyword is what its supposed to be
-    //Remove front() first by erasing
 
     std::cout << endl;
     std::cout <<"parsePrintStatement()" << endl;
@@ -682,43 +695,47 @@ bool parsePrintStatement(){
     std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
 
     string token = keyWords.front();
-    string express = keyWords.front();
-    std::cout <<"Expression: " << keyWords.front() << endl;
-    // For now, check the expression is valid 
-    if (!keyWords.empty() && checkIdentifierExists(keyWords.front())){
-        // Remove the expression from the vector
-        keyWords.erase(keyWords.begin());
-        // Now check if the current keyword is valid
-        if(keyWords.front() == ";"){
+    string manipulatedString = "";
+    // Declare a struct to store the ids
+    struct Ids id;
+    //Check if its id is valid
+    if (!keyWords.empty()){
+        //Should be followed by expression which can be recursive
+        std::cout <<"Expression: " << keyWords.front() << endl;
+        // For now, check the expression is valid 
+        if (!keyWords.empty()){
 
-            // Print the expression since statement is valid
-            // Check if expression is id
-            for(auto &idName: ids){
-                if(idName.idName == express){
-                    // Print it out
-                    std::cout <<"ID Name: " << idName.idName << endl;
-                    std::cout <<"ID Value: " << idName.value << endl;
+            // Call parseExpression to pass the expression
+            if(keyWords.back() == ";" && parseExpression()){
+                // Check if expression ID/Constant, for now lets pretend if not literal
+                // Get first word in expression and check its type to manipulate
+            
+                // Now print the words which conform to a specific pattern utilizing the regex library
+                manipulatedString = resolveExpression();
+                // Now printLength
+                cout << manipulatedString << endl;
 
-                    // Reached the end of the statement
-                    return true;
-                }
+                // Reached the end of the statement
+                return true;
+            } else {
+                // Error Handling
+                std::cout <<"Error: Expected end of statement identifier" << endl;
+                return false;
             }
-
-        } else {
-            // Error Handling
-            std::cout <<"Error: Expected end of statement identifier" << endl;
-            return false;
         }
-    }    
-   
-    return false;   
+    } else {
+        // Error Handling
+        std::cout <<"Error:Missing Expression after printwords" << endl;
+        return false;
+    }
+    return true;   
 }
 
 // Function to parse list statement
 bool parsePrintLengthStatement(){
 
-      std::cout << endl;
-    std::cout <<"parsePrintWordsStatement()" << endl;
+    std::cout << endl;
+    std::cout <<"parsePrintLengthStatement()" << endl;
     std::cout << endl;
 
     //DEBUG
@@ -1004,29 +1021,29 @@ bool parseReverseStatement(){
     keyWords.erase(keyWords.begin());
     std::cout <<"Front keyword AFTER erasing: " << keyWords.front() << endl;
 
-    string token = keyWords.front();
+    string reversedString = "";
     // Declare a struct to store the ids
     string id = "";
     // Check if its id is valid
-    if (!keyWords.empty() && isIdentifierValid(keyWords.front())){
+    if (!keyWords.empty() && checkIdentifierExists(keyWords.front())){
         std::cout <<"ID: " << keyWords.front() << endl;
         // Should be followed by expression which can be recursive
-
-        // Save the id
         id = keyWords.front();
-        // Now check if Id is valid whose value going to be appended to
-        bool idExists = checkIdentifierExists(id);
-        if(!idExists){
-            return false;
-        }
-
         // Remove the id and check the next expression
         keyWords.erase(keyWords.begin());
-
+        
     
         if(keyWords.front() == ";"){
-            // Reached the end of the statement
-            return true;
+            for(auto &iD: ids){
+                if (iD.idName == id){
+                    // Then reverse the string using algorithm library
+                    //reversedString = iD.value;
+                    reverse(iD.value.begin(), iD.value.end());
+                    //iD.value = reversedString;
+                    // Reached the end of the statement
+                    return true;
+                }
+            }
         } else {
             // Error Handling
             std::cout <<"Error: Expected end of statement identifier" << endl;
