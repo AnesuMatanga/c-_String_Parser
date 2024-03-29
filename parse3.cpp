@@ -302,6 +302,7 @@ bool getWordsVector(){
 
     // While loop to extract the words 
     while (ss >> word){
+
         std::cout <<"word[0]: " << word[0] << endl;
         std::cout <<"word: " << word << endl;
         std::cout <<"Word.length: " << word.length() << endl; 
@@ -1024,6 +1025,7 @@ bool parseReverseStatement(){
     string reversedString = "";
     // Declare a struct to store the ids
     string id = "";
+    string word;
     // Check if its id is valid
     if (!keyWords.empty() && checkIdentifierExists(keyWords.front())){
         std::cout <<"ID: " << keyWords.front() << endl;
@@ -1031,15 +1033,40 @@ bool parseReverseStatement(){
         id = keyWords.front();
         // Remove the id and check the next expression
         keyWords.erase(keyWords.begin());
-        
-    
+
         if(keyWords.front() == ";"){
             for(auto &iD: ids){
                 if (iD.idName == id){
                     // Then reverse the string using algorithm library
                     //reversedString = iD.value;
-                    reverse(iD.value.begin(), iD.value.end());
+                    //reverse(iD.value.begin(), iD.value.end());
                     //iD.value = reversedString;
+                    // To reverse using istringstream to split the string into words
+                    istringstream iss(iD.value);
+
+                    //While loop to add words to vector
+                    while(iss >> word){
+                        // Push into words vector
+                        words.push_back(word);
+                    }
+
+                    // Now reversing the order of the words in the vector using reverse from algorithm library
+                    reverse(words.begin(), words.end());
+
+                    // Now join the words to form a string
+                    // Also using size_t incase larger values
+                    for(size_t i = 0; i < words.size(); i++){
+                        // Add to reversed string
+                        reversedString += words[i];
+                        // Add space between words 
+                        if(i != words.size() - 1){
+                            reversedString += " ";
+                        }
+                    }
+                    // Now update the iD value
+                    iD.value = reversedString;
+                    //Also empty the vector Reset
+                    emptyVector(words);
                     // Reached the end of the statement
                     return true;
                 }
